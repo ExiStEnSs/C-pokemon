@@ -5,6 +5,7 @@
 #include "pokemon.hpp"
 #include "entraineur.hpp"
 #include "combat.hpp"
+#include "interface.hpp"
 
 using namespace std;
 
@@ -66,40 +67,8 @@ Joueur* creerJoueurDepuisCSV(const string& chemin, const vector<Pokemon*>& refer
 }
 
 void interfaceUtilisateur(Joueur* joueur, vector<Entraineur*> leaders, vector<Entraineur*> maitres) {
-    bool continuer = true;
-    while (continuer) {
-        cout << "\n===== MENU PRINCIPAL =====\n"
-             << "1. Afficher l'equipe\n"
-             << "2. Soigner les Pokemon\n"
-             << "3. Modifier l'ordre (à venir)\n"
-             << "4. Voir les statistiques\n"
-             << "5. Combattre un leader\n"
-             << "6. Quitter\n"
-             << "Choix : ";
-
-        int choix;
-        cin >> choix;
-
-        switch (choix) {
-            case 1:
-                joueur->afficherEquipe(); break;
-            case 2:
-                joueur->soignerEquipe(); break;
-            case 3:
-                cout << "Fonction de réorganisation à implémenter.\n"; break;
-            case 4:
-                joueur->afficherStats(); break;
-            case 5:
-                if (!leaders.empty()) demarrerCombat(*joueur, *leaders.front());
-                else cout << "Aucun leader disponible.\n"; break;
-            case 6:
-                cout << "\nFermeture de la simulation. A bientôt !\n";
-                continuer = false;
-                break;
-            default:
-                cout << "Choix non valide, veuillez reessayer.\n";
-        }
-    }
+    showTitleScreen();
+    menuPrincipal(joueur, leaders, maitres);
 }
 
 int main() {
@@ -109,6 +78,7 @@ int main() {
     vector<Entraineur*> leaders; // chargement futur
     vector<Entraineur*> maitres; // chargement futur
 
+    clearScreen(); // Ajoutez cette ligne
     interfaceUtilisateur(joueur, leaders, maitres);
 
     for (auto& p : baseDeDonnees) delete p;

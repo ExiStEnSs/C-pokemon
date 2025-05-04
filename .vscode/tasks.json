@@ -11,6 +11,7 @@
                 "${workspaceFolder}\\pokemon.cpp",
                 "${workspaceFolder}\\entraineur.cpp",
                 "${workspaceFolder}\\combat.cpp",
+                "${workspaceFolder}\\interface.cpp",
                 "-o",
                 "${workspaceFolder}\\main.exe"
             ],

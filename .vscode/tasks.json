@@ -3,20 +3,16 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++.exe build active file",
-            "command": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+            "command": "C:\\Users\\HP\\Desktop\\mingw64\\winlibs-x86_64-posix-seh-gcc-15.1.0-mingw-w64msvcrt-12.0.0-r1\\mingw64\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${workspaceFolder}\\main.cpp",
-                "${workspaceFolder}\\pokemon.cpp",
-                "${workspaceFolder}\\entraineur.cpp",
-                "${workspaceFolder}\\combat.cpp",
-                "${workspaceFolder}\\interface.cpp",
+                "${file}",
                 "-o",
-                "${workspaceFolder}\\main.exe"
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${fileDirname}"
             },
             "problemMatcher": [
                 "$gcc"

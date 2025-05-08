@@ -15,7 +15,7 @@ protected:
     int pointsDeVieMax;
     std::string nomAttaque;
     int degatsAttaque;
-    int niveau; // ✅ Ajout pour la V5
+    int niveau;
 
 public:
     Pokemon(const std::string& nom, const std::string& type1, const std::string& type2, int hp, const std::string& attaque, int puissance);
@@ -28,14 +28,16 @@ public:
     int getMaxHp() const;
     std::string getAttaque() const;
     int getPuissance() const;
-    int getNiveau() const;           // ✅ Ajouté
-    void gagnerExperience();         // ✅ Ajouté
+    int getNiveau() const;
 
     void subirDegats(int quantite);
     bool estKo() const;
+    void restaurerPV();
+    
+    // Calcule le multiplicateur de dégâts en fonction du type d'attaque
     virtual double calculerMultiplicateur(const std::string& typeAttaque) const;
 
-    // ✅ Interaction avec le joueur
+    // Interaction avec le joueur
     std::string interaction() const override;
 };
 

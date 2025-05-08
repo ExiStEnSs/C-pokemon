@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
+#include <sstream>
 
 
 // Définition des couleurs ANSI vides (pour désactiver les couleurs)
@@ -156,6 +158,95 @@ void showAttackAnimation(const std::string& attackName, int damage, bool isSuper
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
+// Nouvelles fonctions pour la gestion des leaders et l'historique des combats
+void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders) {
+    clearScreen();
+    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+    std::cout << "|       CHOIX DU LEADER DE GYM        |" << std::endl;
+    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+    
+    if (leaders.empty()) {
+        std::cout << "Aucun leader disponible." << std::endl;
+        waitForEnter();
+        return;
+    }
+    
+    std::cout << "Leaders disponibles :" << std::endl;
+    for (size_t i = 0; i < leaders.size(); ++i) {
+        LeaderGym* leader = dynamic_cast<LeaderGym*>(leaders[i]);
+        if (leader) {
+            std::cout << (i + 1) << ". " << leader->getNom() << " (Arène de " << leader->getNomGym() << ")" << std::endl;
+        } else {
+            std::cout << (i + 1) << ". " << leaders[i]->getNom() << std::endl;
+        }
+    }
+    
+    std::cout << "\nVotre choix (0 pour revenir) : ";
+    int choix;
+    std::cin >> choix;
+    
+    if (choix > 0 && choix <= static_cast<int>(leaders.size())) {
+        // Sauvegarder le nombre de victoires avant le combat
+        int victoires_avant = joueur.getVictoires();
+        
+        // Lancer le combat
+        menuCombat(joueur, *leaders[choix - 1]);
+        
+        // Vérifier si le joueur a gagné
+        if (joueur.getVictoires() > victoires_avant) {
+            sauvegarderLeaderBattu(joueur, leaders[choix - 1]);
+        }
+    }
+}
+
+void sauvegarderLeaderBattu(const Joueur& joueur, Entraineur* leader) {
+    std::ofstream fichier("leaders_battus.txt", std::ios::app);
+    if (!fichier) {
+        std::cerr << "Erreur : Impossible d'ouvrir le fichier leaders_battus.txt" << std::endl;
+        return;
+    }
+    
+    // Obtenir la date et heure actuelles
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+    
+    // Écrire dans le fichier
+    LeaderGym* gym_leader = dynamic_cast<LeaderGym*>(leader);
+    if (gym_leader) {
+        fichier << "Leader " << leader->getNom() 
+                << " (Arène de " << gym_leader->getNomGym() << ")"
+                << " battu par " << joueur.getNom() 
+                << " le " << ss.str() << std::endl;
+    } else {
+        fichier << leader->getNom() << " battu par " << joueur.getNom() 
+                << " le " << ss.str() << std::endl;
+    }
+    
+    fichier.close();
+}
+
+void afficherLeadersBattus() {
+    clearScreen();
+    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+    std::cout << "|       LEADERS DE GYM BATTUS         |" << std::endl;
+    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+    
+    std::ifstream fichier("leaders_battus.txt");
+    if (!fichier) {
+        std::cout << "Aucun leader battu ou fichier introuvable." << std::endl;
+    } else {
+        std::string ligne;
+        while (std::getline(fichier, ligne)) {
+            std::cout << ligne << std::endl;
+        }
+        fichier.close();
+    }
+    
+    waitForEnter();
+}
+
 // Menu principal amélioré
 void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector<Entraineur*> maitres) {
     bool continuer = true;
@@ -163,33 +254,36 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
         clearScreen();
         std::cout << R"(
         
-███╗░░░███╗███████╗███╗░░██╗██╗░░░██╗  ██████╗░██████╗░██╗███╗░░██╗░█████╗░██╗██████╗░░█████╗░██╗░░░░░
-████╗░████║██╔════╝████╗░██║██║░░░██║  ██╔══██╗██╔══██╗██║████╗░██║██╔══██╗██║██╔══██╗██╔══██╗██║░░░░░
-██╔████╔██║█████╗░░██╔██╗██║██║░░░██║  ██████╔╝██████╔╝██║██╔██╗██║██║░░╚═╝██║██████╔╝███████║██║░░░░░
-██║╚██╔╝██║██╔══╝░░██║╚████║██║░░░██║  ██╔═══╝░██╔══██╗██║██║╚████║██║░░██╗██║██╔═══╝░██╔══██║██║░░░░░
-██║░╚═╝░██║███████╗██║░╚███║╚██████╔╝  ██║░░░░░██║░░██║██║██║░╚███║╚█████╔╝██║██║░░░░░██║░░██║███████╗
-╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░╚═════╝░  ╚═╝░░░░░╚═╝░░╚═╝╚═╝╚═╝░░╚══╝░╚════╝░╚═╝╚═╝░░░░░╚═╝░░╚═╝╚══════╝
+███╗░░░███╗███████╗███╗░░██╗██╗░░░██╗  ██████╗░██████╗░██╗███╗░░██╗░█████╗░██╗██████╗░░█████╗░██╗░░░░░
+████╗░████║██╔════╝████╗░██║██║░░░██║  ██╔══██╗██╔══██╗██║████╗░██║██╔══██╗██║██╔══██╗██╔══██╗██║░░░░░
+██╔████╔██║█████╗░░██╔██╗██║██║░░░██║  ██████╔╝██████╔╝██║██╔██╗██║██║░░╚═╝██║██████╔╝███████║██║░░░░░
+██║╚██╔╝██║██╔══╝░░██║╚████║██║░░░██║  ██╔═══╝░██╔══██╗██║██║╚████║██║░░██╗██║██╔═══╝░██╔══██║██║░░░░░
+██║░╚═╝░██║███████╗██║░╚███║╚██████╔╝  ██║░░░░░██║░░██║██║██║░╚███║╚█████╔╝██║██║░░░░░██║░░██║███████╗
+╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░╚═════╝░  ╚═╝░░░░░╚═╝░░╚═╝╚═╝╚═╝░░╚══╝░╚════╝░╚═╝╚═╝░░░░░╚═╝░░╚═╝╚══════╝
         )" << std::endl;
         
-        std::cout << "Dresseur: Joueur" << std::endl;
+        std::cout << "Dresseur: " << joueur->getNom() << std::endl;
         std::cout << std::endl;
         
+        std::cout << "0. Quitter" << std::endl;
         std::cout << "1. Afficher l'equipe" << std::endl;
         std::cout << "2. Soigner les Pokemon" << std::endl;
         std::cout << "3. Modifier l'ordre" << std::endl;
         std::cout << "4. Voir les statistiques" << std::endl;
         std::cout << "5. Combattre un leader" << std::endl;
-        std::cout << "6. Quitter" << std::endl;
-        std::cout << "7. Interagir avec un Pokémon" << std::endl;
-        std::cout << "8. Affronter un Maître Pokémon" << std::endl;
+        std::cout << "6. Interagir avec un Pokémon" << std::endl;
+        std::cout << "7. Affronter un Maître Pokémon" << std::endl;
+        std::cout << "8. Afficher les leaders battus" << std::endl;
 
-
-        
         std::cout << std::endl << "Votre choix : ";
         int choix;
         std::cin >> choix;
         
         switch (choix) {
+            case 0:
+                std::cout << "Fermeture de la simulation. A bientot !" << std::endl;
+                continuer = false;
+                break;
             case 1: {
                 clearScreen();
                 std::cout << "+" << std::string(38, '=') << "+" << std::endl;
@@ -240,70 +334,59 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                 waitForEnter();
                 break;
             case 5:
-                if (!leaders.empty()) {
-                    menuCombat(*joueur, *leaders.front());
-                } else {
-                    std::cout << "Aucun leader disponible." << std::endl;
-                    waitForEnter();
-                }
+                menuChoixLeader(*joueur, leaders);
                 break;
-                
+            case 6: {
+                clearScreen();
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                std::cout << "|     INTERACTION AVEC UN POKÉMON      |" << std::endl;
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
             
-                case 6: {
-                    clearScreen();
-                    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-                    std::cout << "|     INTERACTION AVEC UN POKÉMON      |" << std::endl;
-                    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-                
-                    Pokemon* actif = joueur->pokemonActif();
-                    if (actif) {
-                        std::cout << actif->interaction() << std::endl;
-                    } else {
-                        std::cout << "Aucun Pokémon actif pour interagir." << std::endl;
-                    }
-                
-                    waitForEnter();
-                    break;
+                Pokemon* actif = joueur->pokemonActif();
+                if (actif) {
+                    std::cout << actif->interaction() << std::endl;
+                } else {
+                    std::cout << "Aucun Pokémon actif pour interagir." << std::endl;
                 }
-                
-                case 7: {
-                    clearScreen();
-                    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-                    std::cout << "|     MAÎTRE POKÉMON EN APPROCHE       |" << std::endl;
-                    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-                
-                    if (joueur->getNombreBadges() < 4) {
-                        std::cout << "⛔ Vous devez posséder les 4 badges pour affronter un Maître Pokémon !" << std::endl;
-                        waitForEnter();
-                        break;
-                    }
-                
-                    if (!maitres.empty()) {
-                        srand(static_cast<unsigned int>(time(0)));
-                        int index = rand() % maitres.size();
-                        Entraineur* maitre = maitres[index];
-                
-                        std::cout << "⚔️  Le Maître " << maitre->pokemonActif()->getNom() << " entre en scène !" << std::endl;
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1200));
-                
-                        menuCombat(*joueur, *maitre);
-                    } else {
-                        std::cout << "Aucun Maître Pokémon disponible." << std::endl;
-                    }
-                
-                    waitForEnter();
-                    break;
-                }
-                case 8:
-                std::cout << "Fermeture de la simulation. A bientot !" << std::endl;
-                continuer = false;
+            
+                waitForEnter();
                 break;
-                
-                default:
-                    std::cout << "Choix non valide, veuillez reessayer." << std::endl;
-                    waitForEnter();
             }
-        
+            case 7: {
+                clearScreen();
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                std::cout << "|     MAÎTRE POKÉMON EN APPROCHE       |" << std::endl;
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+            
+                if (joueur->getNombreBadges() < 4) {
+                    std::cout << "⛔ Vous devez posséder les 4 badges pour affronter un Maître Pokémon !" << std::endl;
+                    waitForEnter();
+                    break;
+                }
+            
+                if (!maitres.empty()) {
+                    srand(static_cast<unsigned int>(time(0)));
+                    int index = rand() % maitres.size();
+                    Entraineur* maitre = maitres[index];
+            
+                    std::cout << "⚔️  Le Maître " << maitre->getNom() << " entre en scène !" << std::endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+            
+                    menuCombat(*joueur, *maitre);
+                } else {
+                    std::cout << "Aucun Maître Pokémon disponible." << std::endl;
+                }
+            
+                waitForEnter();
+                break;
+            }
+            case 8:
+                afficherLeadersBattus();
+                break;
+            default:
+                std::cout << "Choix non valide, veuillez reessayer." << std::endl;
+                waitForEnter();
+            }
     }
 }
 
@@ -317,8 +400,8 @@ void menuCombat(Joueur& joueur, Entraineur& adversaire) {
     std::cout << "Un adversaire approche..." << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    std::cout << "\n" << adversaire.pokemonActif()->getNom()
-              << " entre en scène ! Préparez-vous !" << std::endl;
+    std::cout << "\n" << adversaire.getNom() << " envoie " << adversaire.pokemonActif()->getNom()
+              << " ! Préparez-vous !" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 
     std::cout << "\nVous envoyez : " << joueur.pokemonActif()->getNom() << " !" << std::endl;
@@ -333,6 +416,7 @@ void menuCombat(Joueur& joueur, Entraineur& adversaire) {
     std::cout << "\nRetour au menu principal..." << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 }
+
 void choisirPokemonActif(Joueur& joueur) {
     while (true) {
         clearScreen();

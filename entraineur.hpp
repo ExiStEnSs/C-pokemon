@@ -26,6 +26,9 @@ public:
     virtual void afficherEquipe() const;
 
     void echangerPokemon(int index1, int index2);
+    
+    // Ajout: méthode pour obtenir le nom de l'entraîneur
+    std::string getNom() const { return nom; }
 
     // ✅ Ajout : interaction de base pour tout entraîneur
     virtual std::string interaction() const override;
@@ -49,6 +52,7 @@ public:
     void afficherStats() const;
 
     int getNombreBadges() const { return nombreBadges; }
+    int getVictoires() const { return totalVictoires; } // Ajout: getter pour totalVictoires
 
     void enregistrerVaincu(Entraineur* adversaire);
     void interagirAvecVaincus() const;
@@ -64,6 +68,8 @@ private:
 
 public:
     LeaderGym(const std::string& nom, const std::string& gym, const std::string& medaille);
+    std::string getNomGym() const { return nomGym; } // Ajout: getter pour nomGym
+    std::string getMedaille() const { return recompenseMedaille; } // Ajout: getter pour recompenseMedaille
     std::string interaction() const override; // ✅ Ajouté
 };
 

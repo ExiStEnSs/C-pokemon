@@ -33,7 +33,7 @@ void Entraineur::selectionnerPokemon(int nouvelIndex) {
 
 void Entraineur::soignerEquipe() {
     for (auto& p : equipe) {
-        p->subirDegats(-1000); // Restaure PV à fond (hack simple)
+        p->restaurerPV();
     }
     std::cout << "\nTous les Pokémon de l'équipe ont été soignés !\n";
 }
@@ -51,7 +51,7 @@ void Entraineur::afficherEquipe() const {
     }
 }
 
-// ✅ Ajout : Permet d’échanger deux Pokémon dans l’équipe
+// ✅ Ajout : Permet d'échanger deux Pokémon dans l'équipe
 void Entraineur::echangerPokemon(int index1, int index2) {
     if (index1 >= 0 && index1 < static_cast<int>(equipe.size()) &&
         index2 >= 0 && index2 < static_cast<int>(equipe.size())) {
@@ -124,5 +124,3 @@ std::string LeaderGym::interaction() const {
 std::string MaitrePokemon::interaction() const {
     return nom + " dit : \"Félicitations, tu es digne de la Ligue Pokémon.\"";
 }
-
-

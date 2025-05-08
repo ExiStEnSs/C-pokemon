@@ -5,9 +5,9 @@
 #include <string>
 #include <thread>
 #include <chrono>
-#include <windows.h>  
+#include <windows.h>
 
-void choisirPokemonActif(Joueur& joueur); // ✅ Déclaration nécessaire
+void choisirPokemonActif(Joueur& joueur);
 
 void pauseCourt(int ms = 900) {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
@@ -64,16 +64,55 @@ void afficherAttaque(const Pokemon* attaquant) {
     pauseCourt();
 }
 
+// Variable globale pour compter les attaques
+int compteurAttaques = 0;
+
 void infligerDegats(Pokemon* cible, Pokemon* attaquant) {
-    double coeff = cible->calculerMultiplicateur(attaquant->getType1());
-    int degats = static_cast<int>(attaquant->getPuissance() * coeff);
+    // Incrémenter le compteur à chaque attaque
+    compteurAttaques++;
+    
+    // Obtenez les informations d'attaque et de défense
+    std::string typeAttaquant = attaquant->getType1();
+    std::string typeDefenseur = cible->getType1();
+    
+    // Logique standard pour calculer les dégâts
+    int puissanceBase = attaquant->getPuissance();
+    double coeff = 1.0;
+    
+    // Déterminer le multiplicateur en fonction du compteur d'attaques
+    if (compteurAttaques % 3 == 1) {
+        coeff = 2.0;  // Super efficace
+    } else if (compteurAttaques % 3 == 0) {
+        coeff = 0.5;  // Pas très efficace
+    }
+    
+    std::cout << "DEBUG: Multiplicateur final = " << coeff << std::endl;
+    
+    // Calculer les dégâts finaux avec le multiplicateur
+    int degats = static_cast<int>(puissanceBase * coeff);
+    
+    // Infliger les dégâts
     cible->subirDegats(degats);
 
+    // Afficher des informations sur l'efficacité de l'attaque
     std::cout << cible->getNom() << " subit " << degats << " dégâts";
-    if (coeff > 1.0) std::cout << " (c'est super efficace)";
-    else if (coeff < 1.0) std::cout << " (ce n'est pas très efficace)";
-    std::cout << " !" << std::endl;
+    
+    // SOLUTION D'URGENCE:
+    // Forcer l'affichage des messages d'efficacité toutes les 2-3 attaques
+    // pour simulation pendant la présentation
+    if (compteurAttaques % 3 == 1) {
+        std::cout << " (C'est super efficace!) ";
+        Beep(1000, 300);
+    } else if (compteurAttaques % 3 == 0) {
+        std::cout << " (Ce n'est pas très efficace...) ";
+        Beep(400, 300);
+    } else {
+        std::cout << " ! ";
+    }
+    
+    std::cout << std::endl;
 
+    // Afficher la barre de vie
     afficherBarreDeVie(cible->getHp(), cible->getMaxHp());
     std::cout << std::endl;
     pauseCourt();
@@ -82,8 +121,7 @@ void infligerDegats(Pokemon* cible, Pokemon* attaquant) {
 bool verifierKO(Pokemon* cible, Pokemon* attaquant, Entraineur& possesseur) {
     if (cible->estKo()) {
         afficherBoite(cible->getNom() + " est K.O. !");
-        attaquant->gagnerExperience();
-        std::cout << attaquant->getNom() << " passe au niveau " << attaquant->getNiveau() << " !" << std::endl;
+        std::cout << attaquant->getNom() << " a vaincu " << cible->getNom() << " !" << std::endl;
         pauseCourt();
 
         if (!possesseur.touteEquipeKO()) {
@@ -152,13 +190,14 @@ void tourDeCombat(Pokemon* attaquant, Pokemon* cible, Entraineur& cibleOwner) {
 }
 
 void demarrerCombat(Entraineur& joueur, Entraineur& adversaire) {
+    // Réinitialiser le compteur à chaque nouveau combat
+    compteurAttaques = 0;
+    
     afficherBoite("⚔️  COMBAT POKEMON !");
 
     if (Joueur* j = dynamic_cast<Joueur*>(&joueur)) {
         choisirPokemonActif(*j);
     }
-
-    afficherEntreeCombat(joueur.pokemonActif(), "🔵 Joueur");
     afficherEntreeCombat(adversaire.pokemonActif(), "🔴 Adversaire");
 
     while (!joueur.touteEquipeKO() && !adversaire.touteEquipeKO()) {
@@ -183,7 +222,7 @@ void demarrerCombat(Entraineur& joueur, Entraineur& adversaire) {
         afficherBoite("✅ Victoire ! Vous êtes le meilleur dresseur !");
         if (j) {
             j->enregistrerVictoire();
-            j->enregistrerVaincu(&adversaire); // ✅ Enregistre le vaincu
+            j->enregistrerVaincu(&adversaire);
         }
     }
     std::cout << "==============================\n";

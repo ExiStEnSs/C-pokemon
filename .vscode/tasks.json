@@ -1,34 +1,34 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-      {
-        "type": "cppbuild",
-        "label": "📦 Build Pokémon Project",
-        //"command": "C:\\Users\\HP\\Desktop\\mingw64\\winlibs-x86_64-posix-seh-gcc-15.1.0-mingw-w64msvcrt-12.0.0-r1\\mingw64\\bin\\g++.exe",
-        "command": "g++",
-        "args": [
-          "-fdiagnostics-color=always",
-          "-g",
-          "main.cpp",
-          "combat.cpp",
-          "pokemon.cpp",
-          "entraineur.cpp",
-          "interface.cpp",
-          "-o",
-          "pokemon.exe"
-        ],
-        "options": {
-          "cwd": "${workspaceFolder}"
-        },
-        "problemMatcher": [
-          "$gcc"
-        ],
-        "group": {
-          "kind": "build",
-          "isDefault": true
-        },
-        "detail": "Build complet du projet Pokémon"
-      }
-    ]
-  }
-  
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "cppbuild",
+      "label": "📦 Build Pokémon Project",
+      //"command": "C:\\Users\\HP\\Desktop\\mingw64\\winlibs-x86_64-posix-seh-gcc-15.1.0-mingw-w64msvcrt-12.0.0-r1\\mingw64\\bin\\g++.exe",
+      "command": "g++",
+      "args": [
+        "-fdiagnostics-color=always",
+        "-g",
+        "main.cpp",
+        "combat.cpp",
+        "pokemon.cpp",
+        "entraineur.cpp",
+        "interface.cpp",
+        "sauvegarde.cpp",
+        "-o",
+        "pokemon.exe"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Build complet du projet Pokémon"
+    }
+  ]
+}

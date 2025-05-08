@@ -88,7 +88,7 @@ Eau::Eau(const std::string& nom, const std::string& type2, int hp, const std::st
 
 double Eau::calculerMultiplicateur(const std::string& typeAttaque) const {
     // Faiblesses (×2)
-    if (typeAttaque == "Plante" || typeAttaque == "Electrik" || typeAttaque == "Électrik") {
+    if (typeAttaque == "Plante" || typeAttaque == "Electrik") {
         std::cout << "DEBUG: " << this->getNom() << " est faible contre " << typeAttaque << " (×2)" << std::endl;
         return 2.0;
     }
@@ -132,7 +132,7 @@ double Electrik::calculerMultiplicateur(const std::string& typeAttaque) const {
         return 2.0;
     }
     // Résistances (×0.5)
-    if (typeAttaque == "Electrik" || typeAttaque == "Électrik") {
+    if (typeAttaque == "Electrik") {
         std::cout << "DEBUG: " << this->getNom() << " résiste à " << typeAttaque << " (×0.5)" << std::endl;
         return 0.5;
     }
@@ -233,7 +233,7 @@ double Sol::calculerMultiplicateur(const std::string& typeAttaque) const {
         return 0.5;
     }
     // Immunités (×0)
-    if (typeAttaque == "Electrik" || typeAttaque == "Électrik") {
+    if (typeAttaque == "Electrik") {
         std::cout << "DEBUG: " << this->getNom() << " est immunisé contre " << typeAttaque << " (×0)" << std::endl;
         return 0.0;
     }
@@ -295,7 +295,7 @@ double Dragon::calculerMultiplicateur(const std::string& typeAttaque) const {
     }
     // Résistances (×0.5)
     if (typeAttaque == "Feu" || typeAttaque == "Eau" || 
-        typeAttaque == "Electrik" || typeAttaque == "Électrik" || 
+        typeAttaque == "Electrik"|| 
         typeAttaque == "Plante") {
         std::cout << "DEBUG: " << this->getNom() << " résiste à " << typeAttaque << " (×0.5)" << std::endl;
         return 0.5;

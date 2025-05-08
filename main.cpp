@@ -6,6 +6,7 @@
 #include "entraineur.hpp"
 #include "combat.hpp"
 #include "interface.hpp"
+#include "sauvegarde.hpp"
 
 using namespace std;
 
@@ -128,9 +129,9 @@ vector<Entraineur*> chargerEntraineursDepuisCSV(const string& chemin, const vect
     return entraineurs;
 }
 
-void interfaceUtilisateur(Joueur* joueur, vector<Entraineur*> leaders, vector<Entraineur*> maitres) {
+void interfaceUtilisateur(Joueur* joueur, vector<Entraineur*> leaders, vector<Entraineur*> maitres, vector<Pokemon*>& cataloguePokemon) {
     showTitleScreen();
-    menuPrincipal(joueur, leaders, maitres);
+    menuPrincipal(joueur, leaders, maitres, cataloguePokemon);
 }
 
 int main() {
@@ -139,11 +140,38 @@ int main() {
     vector<Pokemon*> baseDeDonnees = importerPokemonDepuisCSV("pokemon.csv");
     Joueur* joueur = creerJoueurDepuisCSV("joueur.csv", baseDeDonnees);
 
+    // Ajout de la possibilité de charger une partie sauvegardée
+    clearScreen();
+    std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+    std::cout << "|      SIMULATEUR DE COMBAT POKÉMON - C++ EDITION     |" << std::endl;
+    std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+    std::cout << "\nAvez-vous une sauvegarde que vous souhaitez charger ?\n" << std::endl;
+    std::cout << "1. 📂 Oui, charger ma partie sauvegardée" << std::endl;
+    std::cout << "0. 🆕 Non, commencer une nouvelle partie, ATTENTION COMMENCER UNE NOUVELLE PARTIE ECRASE LA SAUVEGARDE PRECEDENTE" << std::endl;
+    std::cout << "\nVotre choix : ";
+    int charger;
+    std::cin >> charger;
+    
+    if (charger == 1) {
+        bool chargementReussi = Sauvegarde::chargerPartie(*joueur, baseDeDonnees);
+        if (chargementReussi) {
+            std::cout << "Partie chargée avec succès !" << std::endl;
+        } else {
+            std::cout << "Impossible de charger la partie. Fichier de sauvegarde non trouvé ou corrompu." << std::endl;
+        }
+        waitForEnter();
+    } else {
+        // Si le joueur choisit de ne pas charger une partie, c'est une nouvelle partie
+        // Réinitialisons les fichiers de sauvegarde
+        Sauvegarde::reinitialisationNouvellePartie();
+        waitForEnter();
+    }
+
     vector<Entraineur*> leaders = chargerEntraineursDepuisCSV("leaders.csv", baseDeDonnees, false);
     vector<Entraineur*> maitres = chargerEntraineursDepuisCSV("maitres.csv", baseDeDonnees, true);
 
     clearScreen();
-    interfaceUtilisateur(joueur, leaders, maitres);
+    interfaceUtilisateur(joueur, leaders, maitres, baseDeDonnees);
 
     for (auto& p : baseDeDonnees) delete p;
     for (auto& l : leaders) delete l;

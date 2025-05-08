@@ -1,5 +1,6 @@
 #include "combat.hpp"
 #include "interface.hpp"
+#include "sauvegarde.hpp"
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -51,7 +52,7 @@ void afficherAttaque(const Pokemon* attaquant) {
     if (type == "Feu") effet = "🔥";
     else if (type == "Eau") effet = "💧";
     else if (type == "Plante") effet = "🌿";
-    else if (type == "Électrik" || type == "Electrik") effet = "⚡";
+    else if (type == "Electrik") effet = "⚡";
     else effet = "💥";
 
     std::cout << effet << effet << effet << "  [" << nom << " utilise " << attaque << "!]  " << effet << effet << effet << std::endl;
@@ -81,7 +82,7 @@ void infligerDegats(Pokemon* cible, Pokemon* attaquant) {
     // === CAS SPÉCIAUX ===
     
     // Électrik > Eau (×2)
-    if ((typeAttaquant == "Electrik" || typeAttaquant == "Électrik") && typeDefenseur == "Eau") {
+    if (typeAttaquant == "Electrik" && typeDefenseur == "Eau") {
         coeff = 2.0;
         std::cout << "DEBUG: Électrik est super efficace contre Eau!" << std::endl;
     }
@@ -251,6 +252,13 @@ void demarrerCombat(Entraineur& joueur, Entraineur& adversaire) {
         if (j) {
             j->enregistrerVictoire();
             j->enregistrerVaincu(&adversaire);
+            
+            // Afficher un message qui rappelle au joueur qu'il peut sauvegarder sa partie
+            MaitrePokemon* maitre = dynamic_cast<MaitrePokemon*>(&adversaire);
+            if (maitre) {
+                std::cout << "Victoire contre un Maître Pokémon ! N'oubliez pas de sauvegarder votre partie via le menu principal." << std::endl;
+                pauseCourt(1500);
+            }
         }
     }
     std::cout << "==============================\n";

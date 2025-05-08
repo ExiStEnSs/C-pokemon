@@ -13,9 +13,16 @@ void Entraineur::ajouterPokemon(Pokemon* nouveau) {
     equipe.push_back(nouveau);
 }
 
-Pokemon* Entraineur::pokemonActif() const {
+Pokemon* Entraineur::pokemonActif(int index) const {
     if (equipe.empty()) return nullptr;
-    return equipe[indexPokemonActif];
+    if (index == -1) {
+        // Comportement par défaut: retourner le Pokémon actif
+        return equipe[indexPokemonActif];
+    } else if (index >= 0 && index < static_cast<int>(equipe.size())) {
+        // Retourner le Pokémon à l'index spécifié
+        return equipe[index];
+    }
+    return nullptr;
 }
 
 bool Entraineur::touteEquipeKO() const {
@@ -36,6 +43,14 @@ void Entraineur::soignerEquipe() {
         p->restaurerPV();
     }
     std::cout << "\nTous les Pokémon de l'équipe ont été soignés !\n";
+}
+
+void Entraineur::viderEquipe() {
+    for (auto& p : equipe) {
+        delete p;
+    }
+    equipe.clear();
+    indexPokemonActif = 0;
 }
 
 void Entraineur::afficherEquipe() const {

@@ -38,13 +38,15 @@ void showBattleScreen(const Pokemon* playerPokemon, const Pokemon* enemyPokemon)
 void showAttackAnimation(const std::string& attackName, int damage, bool isSuperEffective);
 
 // Interface utilisateur améliorée
-void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector<Entraineur*> maitres);
+void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector<Entraineur*> maitres, std::vector<Pokemon*>& cataloguePokemon);
 void menuCombat(Joueur& joueur, Entraineur& adversaire);
 
 // Nouvelles fonctions pour gérer le choix des leaders et la sauvegarde
 void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders);
-void sauvegarderLeaderBattu(const Joueur& joueur, Entraineur* leader);
 void afficherLeadersBattus();
+
+// Options de sauvegarde et chargement
+void menuSauvegardeChargement(Joueur& joueur, std::vector<Pokemon*>& cataloguePokemon, std::vector<Entraineur*>& leaders, std::vector<Entraineur*>& maitres);
 
 // 💥 Déclaration ajoutée ici pour résoudre l'erreur dans combat.cpp
 void choisirPokemonActif(Joueur& joueur);

@@ -19,11 +19,13 @@ public:
     virtual ~Entraineur();
 
     void ajouterPokemon(Pokemon* nouveau);
-    Pokemon* pokemonActif() const;
+    Pokemon* pokemonActif(int index = -1) const;
     bool touteEquipeKO() const;
     void selectionnerPokemon(int nouvelIndex);
     void soignerEquipe();
     virtual void afficherEquipe() const;
+    int getTailleEquipe() const { return equipe.size(); }
+    void viderEquipe();
 
     void echangerPokemon(int index1, int index2);
     
@@ -52,7 +54,8 @@ public:
     void afficherStats() const;
 
     int getNombreBadges() const { return nombreBadges; }
-    int getVictoires() const { return totalVictoires; } // Ajout: getter pour totalVictoires
+    int getVictoires() const { return totalVictoires; }
+    int getDefaites() const { return totalDefaites; }
 
     void enregistrerVaincu(Entraineur* adversaire);
     void interagirAvecVaincus() const;

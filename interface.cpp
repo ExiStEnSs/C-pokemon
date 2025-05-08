@@ -1,5 +1,6 @@
 // interface.cpp - Version sans codes ANSI
 #include "interface.hpp"
+#include "sauvegarde.hpp"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -158,7 +159,27 @@ void showAttackAnimation(const std::string& attackName, int damage, bool isSuper
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
-// Nouvelles fonctions pour la gestion des leaders et l'historique des combats
+// Cette fonction a été déplacée dans la classe Sauvegarde
+
+void afficherLeadersBattus() {
+    clearScreen();
+    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+    std::cout << "|       LEADERS DE GYM BATTUS         |" << std::endl;
+    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+    
+    std::vector<std::string> leaders = Sauvegarde::chargerLeadersBattus();
+    
+    if (leaders.empty()) {
+        std::cout << "Aucun leader battu ou fichier introuvable." << std::endl;
+    } else {
+        for (const auto& ligne : leaders) {
+            std::cout << ligne << std::endl;
+        }
+    }
+    
+    waitForEnter();
+}
+
 void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders) {
     clearScreen();
     std::cout << "+" << std::string(38, '=') << "+" << std::endl;
@@ -194,61 +215,57 @@ void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders) {
         
         // Vérifier si le joueur a gagné
         if (joueur.getVictoires() > victoires_avant) {
-            sauvegarderLeaderBattu(joueur, leaders[choix - 1]);
+            Sauvegarde::sauvegarderLeaderBattu(joueur, leaders[choix - 1]);
+            
+            // Rappeler au joueur qu'il peut sauvegarder
+            std::cout << "Félicitations ! N'oubliez pas que vous pouvez sauvegarder votre partie via le menu principal." << std::endl;
+            waitForEnter();
         }
     }
 }
 
-void sauvegarderLeaderBattu(const Joueur& joueur, Entraineur* leader) {
-    std::ofstream fichier("leaders_battus.txt", std::ios::app);
-    if (!fichier) {
-        std::cerr << "Erreur : Impossible d'ouvrir le fichier leaders_battus.txt" << std::endl;
-        return;
-    }
-    
-    // Obtenir la date et heure actuelles
-    auto now = std::chrono::system_clock::now();
-    auto in_time_t = std::chrono::system_clock::to_time_t(now);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
-    
-    // Écrire dans le fichier
-    LeaderGym* gym_leader = dynamic_cast<LeaderGym*>(leader);
-    if (gym_leader) {
-        fichier << "Leader " << leader->getNom() 
-                << " (Arène de " << gym_leader->getNomGym() << ")"
-                << " battu par " << joueur.getNom() 
-                << " le " << ss.str() << std::endl;
-    } else {
-        fichier << leader->getNom() << " battu par " << joueur.getNom() 
-                << " le " << ss.str() << std::endl;
-    }
-    
-    fichier.close();
-}
-
-void afficherLeadersBattus() {
+// Menu de sauvegarde et chargement
+void menuSauvegardeChargement(Joueur& joueur, std::vector<Pokemon*>& cataloguePokemon, std::vector<Entraineur*>& leaders, std::vector<Entraineur*>& maitres) {
     clearScreen();
     std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-    std::cout << "|       LEADERS DE GYM BATTUS         |" << std::endl;
+    std::cout << "|       SAUVEGARDE & CHARGEMENT       |" << std::endl;
     std::cout << "+" << std::string(38, '=') << "+" << std::endl;
     
-    std::ifstream fichier("leaders_battus.txt");
-    if (!fichier) {
-        std::cout << "Aucun leader battu ou fichier introuvable." << std::endl;
-    } else {
-        std::string ligne;
-        while (std::getline(fichier, ligne)) {
-            std::cout << ligne << std::endl;
-        }
-        fichier.close();
-    }
+    std::cout << "Options disponibles :" << std::endl;
+    std::cout << "1. 💾 Sauvegarder la progression actuelle (équipe, badges, statistiques)" << std::endl;
+    std::cout << "2. 📂 Charger une partie sauvegardée précédemment" << std::endl;
+    std::cout << "0. ◀️ Retour au menu principal" << std::endl;
     
-    waitForEnter();
+    std::cout << "\nVotre choix : ";
+    int choix;
+    std::cin >> choix;
+    
+    switch (choix) {
+        case 1:
+            // Sauvegarder la partie
+            Sauvegarde::sauvegarderPartie(joueur);
+            std::cout << "Sauvegarde effectuée avec succès !" << std::endl;
+            waitForEnter();
+            break;
+            
+        case 2:
+            // Charger une partie
+            if (Sauvegarde::chargerPartie(joueur, cataloguePokemon)) {
+                std::cout << "Partie chargée avec succès !" << std::endl;
+            } else {
+                std::cout << "Impossible de charger la partie. Fichier de sauvegarde non trouvé ou corrompu." << std::endl;
+            }
+            waitForEnter();
+            break;
+            
+        case 0:
+        default:
+            break;
+    }
 }
 
 // Menu principal amélioré
-void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector<Entraineur*> maitres) {
+void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector<Entraineur*> maitres, std::vector<Pokemon*>& cataloguePokemon) {
     bool continuer = true;
     while (continuer) {
         clearScreen();
@@ -274,6 +291,7 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
         std::cout << "6. Interagir avec un Pokémon" << std::endl;
         std::cout << "7. Affronter un Maître Pokémon" << std::endl;
         std::cout << "8. Afficher les leaders battus" << std::endl;
+        std::cout << "9. 💾 Sauvegarder" << std::endl;
 
         std::cout << std::endl << "Votre choix : ";
         int choix;
@@ -382,6 +400,9 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
             }
             case 8:
                 afficherLeadersBattus();
+                break;
+            case 9:
+                menuSauvegardeChargement(*joueur, cataloguePokemon, leaders, maitres);
                 break;
             default:
                 std::cout << "Choix non valide, veuillez reessayer." << std::endl;

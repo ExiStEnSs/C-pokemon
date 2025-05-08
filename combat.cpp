@@ -68,28 +68,53 @@ void afficherAttaque(const Pokemon* attaquant) {
 int compteurAttaques = 0;
 
 void infligerDegats(Pokemon* cible, Pokemon* attaquant) {
-    // Incrémenter le compteur à chaque attaque
-    compteurAttaques++;
-    
-    // Obtenez les informations d'attaque et de défense
+    // Obtenir les types pour le débogage
     std::string typeAttaquant = attaquant->getType1();
     std::string typeDefenseur = cible->getType1();
     
-    // Logique standard pour calculer les dégâts
-    int puissanceBase = attaquant->getPuissance();
+    // Débogage pour voir les types impliqués
+    std::cout << "DEBUG: Type attaquant = " << typeAttaquant << ", Type défenseur = " << typeDefenseur << std::endl;
+    
+    // Calcul direct du multiplicateur sans passer par la méthode calculerMultiplicateur
     double coeff = 1.0;
     
-    // Déterminer le multiplicateur en fonction du compteur d'attaques
-    if (compteurAttaques % 3 == 1) {
-        coeff = 2.0;  // Super efficace
-    } else if (compteurAttaques % 3 == 0) {
-        coeff = 0.5;  // Pas très efficace
+    // === CAS SPÉCIAUX ===
+    
+    // Électrik > Eau (×2)
+    if ((typeAttaquant == "Electrik" || typeAttaquant == "Électrik") && typeDefenseur == "Eau") {
+        coeff = 2.0;
+        std::cout << "DEBUG: Électrik est super efficace contre Eau!" << std::endl;
+    }
+    // Eau > Feu (×2)
+    else if (typeAttaquant == "Eau" && typeDefenseur == "Feu") {
+        coeff = 2.0;
+        std::cout << "DEBUG: Eau est super efficace contre Feu!" << std::endl;
+    }
+    // Feu > Plante (×2)
+    else if (typeAttaquant == "Feu" && typeDefenseur == "Plante") {
+        coeff = 2.0;
+        std::cout << "DEBUG: Feu est super efficace contre Plante!" << std::endl;
+    }
+    // Plante > Eau (×2)
+    else if (typeAttaquant == "Plante" && typeDefenseur == "Eau") {
+        coeff = 2.0;
+        std::cout << "DEBUG: Plante est super efficace contre Eau!" << std::endl;
+    }
+    // Eau résiste au Feu (×0.5)
+    else if (typeAttaquant == "Feu" && typeDefenseur == "Eau") {
+        coeff = 0.5;
+        std::cout << "DEBUG: Eau résiste au Feu!" << std::endl;
+    }
+    // Feu résiste à la Plante (×0.5)
+    else if (typeAttaquant == "Plante" && typeDefenseur == "Feu") {
+        coeff = 0.5;
+        std::cout << "DEBUG: Feu résiste à la Plante!" << std::endl;
     }
     
     std::cout << "DEBUG: Multiplicateur final = " << coeff << std::endl;
     
-    // Calculer les dégâts finaux avec le multiplicateur
-    int degats = static_cast<int>(puissanceBase * coeff);
+    // Calculer les dégâts finaux
+    int degats = static_cast<int>(attaquant->getPuissance() * coeff);
     
     // Infliger les dégâts
     cible->subirDegats(degats);
@@ -97,16 +122,19 @@ void infligerDegats(Pokemon* cible, Pokemon* attaquant) {
     // Afficher des informations sur l'efficacité de l'attaque
     std::cout << cible->getNom() << " subit " << degats << " dégâts";
     
-    // SOLUTION D'URGENCE:
-    // Forcer l'affichage des messages d'efficacité toutes les 2-3 attaques
-    // pour simulation pendant la présentation
-    if (compteurAttaques % 3 == 1) {
+    if (coeff >= 2.0) {
         std::cout << " (C'est super efficace!) ";
-        Beep(1000, 300);
-    } else if (compteurAttaques % 3 == 0) {
+        Beep(1000, 300);  // Son pour super efficace
+    } 
+    else if (coeff <= 0.1) {
+        std::cout << " (Ça n'affecte pas " << cible->getNom() << "...) ";
+        Beep(200, 300);  // Son pour inefficace
+    } 
+    else if (coeff <= 0.5) {
         std::cout << " (Ce n'est pas très efficace...) ";
-        Beep(400, 300);
-    } else {
+        Beep(400, 300);  // Son pour pas très efficace
+    } 
+    else {
         std::cout << " ! ";
     }
     

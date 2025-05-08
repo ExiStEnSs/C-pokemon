@@ -23,8 +23,8 @@ Piafabec,Normal,Vol,40,Picpic,60
 Rapasdepic,Normal,Vol,65,Drill-Peck,100
 Abo,Poison,,35,Morsure,60
 Arbok,Poison,,60,Acide,85
-Pikachu,electrik,,35,eclair,70
-Raichu,electrik,,60,Tonnerre,100
+Pikachu,Electrik,,35,eclair,70
+Raichu,Electrik,,60,Tonnerre,100
 Sabelette,Sol,,50,Griffe,60
 Sablaireau,Sol,,75,Jet de Sable,85
 Nidoran Femelle,Poison,,55,Dard-Venin,60
@@ -79,8 +79,8 @@ Ponyta,Feu,,50,Flammeche,65
 Galopa,Feu,,65,Deflagration,110
 Ramoloss,Eau,Psy,90,Pistolet a† O,60
 Flagadoss,Eau,Psy,95,Psyko,110
-Magneti,electrik,Acier,25,eclair,55
-Magneton,electrik,Acier,50,Tonnerre,95
+Magneti,Electrik,Acier,25,eclair,55
+Magneton,Electrik,Acier,50,Tonnerre,95
 Canarticho,Normal,Vol,52,Coupe,70
 Doduo,Normal,Vol,35,Cru-Ailes,75
 Dodrio,Normal,Vol,60,Drill-Peck,100
@@ -98,8 +98,8 @@ Soporifik,Psy,,60,Choc Mental,60
 Hypnomade,Psy,,85,Psyko,100
 Krabby,Eau,,30,Pince-Masse,75
 Krabboss,Eau,,55,Hydroqueue,95
-Voltorbe,electrik,,40,eclair,55
-electrode,electrik,,60,Tonnerre,95
+Voltorbe,Electrik,,40,eclair,55
+electrode,Electrik,,60,Tonnerre,95
 N≈ìun≈ìuf,Plante,Psy,60,Choc Mental,65
 Noadkoko,Plante,Psy,95,Lance-Soleil,120
 Osselait,Sol,,50,Massde Os,70
@@ -123,7 +123,7 @@ Staross,Eau,Psy,60,Psyko,120
 Mime,Psy,Fee,40,Mur Lumiere,100
 Insecateur,Insecte,Vol,70,Cru-Ailes,110
 Lippoutou,Glace,Psy,65,Blizzard,115
-elektek,electrik,,65,Tonnerre,110
+elektek,Electrik,,65,Tonnerre,110
 Magmar,Feu,,65,Deflagration,110
 Scarabrute,Insecte,,65,Coup de Boule,125
 Tauros,Normal,,75,Charge,100
@@ -133,7 +133,7 @@ Lokhlass,Eau,Glace,130,Laser Glace,120
 Metamorph,Normal,,48,Morphing,0
 evoli,Normal,,55,Morsure,70
 Aquali,Eau,,130,Hydrocanon,110
-Voltali,electrik,,65,Tonnerre,110
+Voltali,Electrik,,65,Tonnerre,110
 Pyroli,Feu,,65,Deflagration,110
 Porygon,Normal,,65,Vague Psy,90
 Amonita,Roche,Eau,35,eboulement,80
@@ -143,7 +143,7 @@ Kabutops,Roche,Eau,60,Lame de Roc,115
 Ptera,Roche,Vol,80,Cru-Ailes,120
 Ronflex,Normal,,160,Coude Kra¢ne,110
 Artikodin,Glace,Vol,90,Blizzard,125
-electhor,electrik,Vol,90,Fatal-Foudre,125
+electhor,Electrik,Vol,90,Fatal-Foudre,125
 Sulfura,Feu,Vol,90,Lance-Flammes,125
 Minidraco,Dragon,,41,Draco-Rage,90
 Draco,Dragon,,61,Vive-Attaque,110

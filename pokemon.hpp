@@ -41,24 +41,109 @@ public:
     std::string interaction() const override;
 };
 
-// Classe pour les Pokemon de type Feu
+// Classes pour chaque type de Pokémon
+// 1. Type Feu
 class Feu : public Pokemon {
 public:
     Feu(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
     double calculerMultiplicateur(const std::string& typeAttaque) const override;
 };
 
-// Classe pour les Pokemon de type Eau
+// 2. Type Eau
 class Eau : public Pokemon {
 public:
     Eau(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
     double calculerMultiplicateur(const std::string& typeAttaque) const override;
 };
 
-// Classe pour les Pokemon de type Plante
+// 3. Type Plante
 class Plante : public Pokemon {
 public:
     Plante(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 4. Type Électrik
+class Electrik : public Pokemon {
+public:
+    Electrik(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 5. Type Normal
+class Normal : public Pokemon {
+public:
+    Normal(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 6. Type Psy
+class Psy : public Pokemon {
+public:
+    Psy(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 7. Type Poison
+class Poison : public Pokemon {
+public:
+    Poison(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 8. Type Insecte
+class Insecte : public Pokemon {
+public:
+    Insecte(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 9. Type Sol
+class Sol : public Pokemon {
+public:
+    Sol(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 10. Type Roche
+class Roche : public Pokemon {
+public:
+    Roche(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 11. Type Glace
+class Glace : public Pokemon {
+public:
+    Glace(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 12. Type Dragon
+class Dragon : public Pokemon {
+public:
+    Dragon(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 13. Type Spectre
+class Spectre : public Pokemon {
+public:
+    Spectre(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 14. Type Combat
+class Combat : public Pokemon {
+public:
+    Combat(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
+    double calculerMultiplicateur(const std::string& typeAttaque) const override;
+};
+
+// 15. Type Fée
+class Fee : public Pokemon {
+public:
+    Fee(const std::string& nom, const std::string& type2, int hp, const std::string& attaque, int puissance);
     double calculerMultiplicateur(const std::string& typeAttaque) const override;
 };
 

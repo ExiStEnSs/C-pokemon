@@ -29,9 +29,23 @@ vector<Pokemon*> importerPokemonDepuisCSV(const string& cheminFichier) {
             flux >> puissance;
 
             Pokemon* p = nullptr;
+            
+            // Création des objets Pokémon en fonction du type1
             if (type1 == "Feu") p = new Feu(nom, type2, hp, attaque, puissance);
             else if (type1 == "Eau") p = new Eau(nom, type2, hp, attaque, puissance);
             else if (type1 == "Plante") p = new Plante(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Electrik") p = new Electrik(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Normal") p = new Normal(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Psy") p = new Psy(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Poison") p = new Poison(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Insecte") p = new Insecte(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Sol") p = new Sol(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Roche") p = new Roche(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Glace") p = new Glace(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Dragon") p = new Dragon(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Spectre") p = new Spectre(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Combat") p = new Combat(nom, type2, hp, attaque, puissance);
+            else if (type1 == "Fee") p = new Fee(nom, type2, hp, attaque, puissance);
             else p = new Pokemon(nom, type1, type2, hp, attaque, puissance);
 
             if (p) catalogue.emplace_back(p);

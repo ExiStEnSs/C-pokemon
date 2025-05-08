@@ -247,12 +247,9 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                     waitForEnter();
                 }
                 break;
-                case 6:
-                std::cout << "Fermeture de la simulation. A bientot !" << std::endl;
-                continuer = false;
-                break;
+                
             
-                case 7: {
+                case 6: {
                     clearScreen();
                     std::cout << "+" << std::string(38, '=') << "+" << std::endl;
                     std::cout << "|     INTERACTION AVEC UN POKÉMON      |" << std::endl;
@@ -269,7 +266,7 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                     break;
                 }
                 
-                case 8: {
+                case 7: {
                     clearScreen();
                     std::cout << "+" << std::string(38, '=') << "+" << std::endl;
                     std::cout << "|     MAÎTRE POKÉMON EN APPROCHE       |" << std::endl;
@@ -297,6 +294,10 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                     waitForEnter();
                     break;
                 }
+                case 8:
+                std::cout << "Fermeture de la simulation. A bientot !" << std::endl;
+                continuer = false;
+                break;
                 
                 default:
                     std::cout << "Choix non valide, veuillez reessayer." << std::endl;

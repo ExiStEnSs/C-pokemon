@@ -1,11 +1,12 @@
 #ifndef POKEMON_HPP
 #define POKEMON_HPP
 
+#include "interagir.hpp"
 #include <string>
 #include <vector>
 
 // Classe de base generique pour tous les Pokemon
-class Pokemon {
+class Pokemon : public Interagir {
 protected:
     std::string nom;
     std::string typePrincipal;
@@ -33,6 +34,9 @@ public:
     void subirDegats(int quantite);
     bool estKo() const;
     virtual double calculerMultiplicateur(const std::string& typeAttaque) const;
+
+    // ✅ Interaction avec le joueur
+    std::string interaction() const override;
 };
 
 // Classe pour les Pokemon de type Feu

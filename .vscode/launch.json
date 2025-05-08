@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "▶️ Lancer le jeu Pokémon",
+        "type": "cppvsdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/pokemon.exe",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "console": "externalTerminal"
+      }
+    ]
+  }
+  

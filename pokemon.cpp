@@ -96,3 +96,7 @@ double Plante::calculerMultiplicateur(const std::string& typeAttaque) const {
     if (std::find(resistances.begin(), resistances.end(), typeAttaque) != resistances.end()) return 0.5;
     return 1.0;
 }
+std::string Pokemon::interaction() const {
+    return nom + " vous regarde avec enthousiasme !";
+}
+

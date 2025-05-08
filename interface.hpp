@@ -41,4 +41,7 @@ void showAttackAnimation(const std::string& attackName, int damage, bool isSuper
 void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector<Entraineur*> maitres);
 void menuCombat(Joueur& joueur, Entraineur& adversaire);
 
+// 💥 Déclaration ajoutée ici pour résoudre l'erreur dans combat.cpp
+void choisirPokemonActif(Joueur& joueur);
+
 #endif

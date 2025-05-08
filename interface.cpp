@@ -4,6 +4,9 @@
 #include <thread>
 #include <chrono>
 #include <iomanip>
+#include <cstdlib>
+#include <ctime>
+
 
 // Définition des couleurs ANSI vides (pour désactiver les couleurs)
 namespace Color {
@@ -177,6 +180,10 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
         std::cout << "4. Voir les statistiques" << std::endl;
         std::cout << "5. Combattre un leader" << std::endl;
         std::cout << "6. Quitter" << std::endl;
+        std::cout << "7. Interagir avec un Pokémon" << std::endl;
+        std::cout << "8. Affronter un Maître Pokémon" << std::endl;
+
+
         
         std::cout << std::endl << "Votre choix : ";
         int choix;
@@ -202,10 +209,27 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                 waitForEnter();
                 break;
             }
-            case 3:
-                std::cout << "Fonction de reorganisation a implementer.\n";
+            case 3: {
+                clearScreen();
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                std::cout << "|     MODIFICATION DE L'ORDRE          |" << std::endl;
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+            
+                joueur->afficherEquipe();
+            
+                int i, j;
+                std::cout << "\nEntrez le numéro du 1er Pokémon à échanger (1-6) : ";
+                std::cin >> i;
+                std::cout << "Entrez le numéro du 2e Pokémon à échanger (1-6) : ";
+                std::cin >> j;
+            
+                joueur->echangerPokemon(i - 1, j - 1);
+            
+                std::cout << "\nNouvelle composition de l'équipe :\n";
+                joueur->afficherEquipe();
                 waitForEnter();
                 break;
+            }
             case 4:
                 clearScreen();
                 std::cout << "+" << std::string(38, '=') << "+" << std::endl;
@@ -223,14 +247,62 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                     waitForEnter();
                 }
                 break;
-            case 6:
+                case 6:
                 std::cout << "Fermeture de la simulation. A bientot !" << std::endl;
                 continuer = false;
                 break;
-            default:
-                std::cout << "Choix non valide, veuillez reessayer." << std::endl;
-                waitForEnter();
-        }
+            
+                case 7: {
+                    clearScreen();
+                    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                    std::cout << "|     INTERACTION AVEC UN POKÉMON      |" << std::endl;
+                    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                
+                    Pokemon* actif = joueur->pokemonActif();
+                    if (actif) {
+                        std::cout << actif->interaction() << std::endl;
+                    } else {
+                        std::cout << "Aucun Pokémon actif pour interagir." << std::endl;
+                    }
+                
+                    waitForEnter();
+                    break;
+                }
+                
+                case 8: {
+                    clearScreen();
+                    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                    std::cout << "|     MAÎTRE POKÉMON EN APPROCHE       |" << std::endl;
+                    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                
+                    if (joueur->getNombreBadges() < 4) {
+                        std::cout << "⛔ Vous devez posséder les 4 badges pour affronter un Maître Pokémon !" << std::endl;
+                        waitForEnter();
+                        break;
+                    }
+                
+                    if (!maitres.empty()) {
+                        srand(static_cast<unsigned int>(time(0)));
+                        int index = rand() % maitres.size();
+                        Entraineur* maitre = maitres[index];
+                
+                        std::cout << "⚔️  Le Maître " << maitre->pokemonActif()->getNom() << " entre en scène !" << std::endl;
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+                
+                        menuCombat(*joueur, *maitre);
+                    } else {
+                        std::cout << "Aucun Maître Pokémon disponible." << std::endl;
+                    }
+                
+                    waitForEnter();
+                    break;
+                }
+                
+                default:
+                    std::cout << "Choix non valide, veuillez reessayer." << std::endl;
+                    waitForEnter();
+            }
+        
     }
 }
 
@@ -240,12 +312,50 @@ void menuCombat(Joueur& joueur, Entraineur& adversaire) {
     std::cout << "+" << std::string(38, '=') << "+" << std::endl;
     std::cout << "|              COMBAT !                |" << std::endl;
     std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-    
-    std::cout << "Le combat commence !" << std::endl;
+
+    std::cout << "Un adversaire approche..." << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    
-    // Utiliser la fonction de combat existante
+
+    std::cout << "\n" << adversaire.pokemonActif()->getNom()
+              << " entre en scène ! Préparez-vous !" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+    std::cout << "\nVous envoyez : " << joueur.pokemonActif()->getNom() << " !" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    std::cout << "\nLe combat commence..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    // Lancement réel du combat
     demarrerCombat(joueur, adversaire);
-    
-    waitForEnter();
+
+    std::cout << "\nRetour au menu principal..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+}
+void choisirPokemonActif(Joueur& joueur) {
+    while (true) {
+        clearScreen();
+        std::cout << "=== Choisissez un Pokémon ===\n\n";
+        joueur.afficherEquipe();
+
+        std::cout << "\nNuméro du Pokémon à envoyer au combat : ";
+        int choix;
+        std::cin >> choix;
+
+        if (choix >= 1 && choix <= 6) {
+            Pokemon* selection = joueur.pokemonActif();
+            joueur.selectionnerPokemon(choix - 1);
+            if (!joueur.pokemonActif()->estKo()) {
+                std::cout << "\nVous avez choisi : " << joueur.pokemonActif()->getNom() << "\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                break;
+            } else {
+                std::cout << "Ce Pokémon est K.O. ! Choisissez-en un autre.\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+            }
+        } else {
+            std::cout << "Entrée invalide. Essayez encore.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+    }
 }

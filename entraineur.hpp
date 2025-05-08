@@ -5,9 +5,10 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "interagir.hpp"
 
 // Classe de base représentant un entraîneur de Pokémon
-class Entraineur {
+class Entraineur : public Interagir {
 protected:
     std::string nom;
     std::vector<Pokemon*> equipe;
@@ -21,8 +22,13 @@ public:
     Pokemon* pokemonActif() const;
     bool touteEquipeKO() const;
     void selectionnerPokemon(int nouvelIndex);
-    void soignerEquipe();                        // ✅ Ajouté pour V5
+    void soignerEquipe();
     virtual void afficherEquipe() const;
+
+    void echangerPokemon(int index1, int index2);
+
+    // ✅ Ajout : interaction de base pour tout entraîneur
+    virtual std::string interaction() const override;
 };
 
 // Classe représentant un joueur humain
@@ -31,6 +37,7 @@ private:
     int nombreBadges;
     int totalVictoires;
     int totalDefaites;
+    std::vector<Entraineur*> adversairesVaincus;
 
 public:
     explicit Joueur(const std::string& nom);
@@ -38,8 +45,15 @@ public:
     void incrementerBadge();
     void enregistrerVictoire();
     void enregistrerDefaite();
-    std::string getRank() const;                // ✅ Ajouté pour V5
+    std::string getRank() const;
     void afficherStats() const;
+
+    int getNombreBadges() const { return nombreBadges; }
+
+    void enregistrerVaincu(Entraineur* adversaire);
+    void interagirAvecVaincus() const;
+
+    std::string interaction() const override; // ✅ Ajouté
 };
 
 // Classe représentant un leader de gymnase
@@ -50,6 +64,7 @@ private:
 
 public:
     LeaderGym(const std::string& nom, const std::string& gym, const std::string& medaille);
+    std::string interaction() const override; // ✅ Ajouté
 };
 
 // Classe représentant le maître Pokémon
@@ -57,6 +72,7 @@ class MaitrePokemon : public Entraineur {
 public:
     explicit MaitrePokemon(const std::string& nom);
     int appliquerBonusDegats(int degatsDeBase) const;
+    std::string interaction() const override; // ✅ Ajouté
 };
 
 #endif

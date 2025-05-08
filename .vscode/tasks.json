@@ -5,7 +5,7 @@
         "type": "cppbuild",
         "label": "📦 Build Pokémon Project",
         //"command": "C:\\Users\\HP\\Desktop\\mingw64\\winlibs-x86_64-posix-seh-gcc-15.1.0-mingw-w64msvcrt-12.0.0-r1\\mingw64\\bin\\g++.exe",
-        "command": "C:\\Users\\chris\\Desktop\\cours\\A3\\C++\\C-pokemon",
+        "command": "g++",
         "args": [
           "-fdiagnostics-color=always",
           "-g",

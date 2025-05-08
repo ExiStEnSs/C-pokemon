@@ -8,6 +8,9 @@
 #include "entraineur.hpp"
 #include "combat.hpp"
 
+// Déclaration de la fonction créerJoueurDepuisCSV avec index
+Joueur* creerJoueurDepuisCSV(const std::string& chemin, const std::vector<Pokemon*>& reference, int index);
+
 // Namespace pour les couleurs ANSI
 namespace Color {
     extern const std::string RESET;
@@ -47,6 +50,9 @@ void afficherLeadersBattus();
 
 // Options de sauvegarde et chargement
 void menuSauvegardeChargement(Joueur& joueur, std::vector<Pokemon*>& cataloguePokemon, std::vector<Entraineur*>& leaders, std::vector<Entraineur*>& maitres);
+
+// Fonction pour la gestion de l'entraîneur (option 3)
+void menuGestionEntraineur(Joueur*& joueur, std::vector<Pokemon*>& cataloguePokemon);
 
 // 💥 Déclaration ajoutée ici pour résoudre l'erreur dans combat.cpp
 void choisirPokemonActif(Joueur& joueur);

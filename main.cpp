@@ -73,16 +73,201 @@ Joueur* creerJoueurDepuisCSV(const string& chemin, const vector<Pokemon*>& refer
     for (auto nomPk : nomsPokemon) {
         // Nettoyage des espaces invisibles
         nomPk.erase(nomPk.find_last_not_of(" \n\r\t") + 1);
+        if (nomPk.empty()) continue;  // Ignorer les emplacements vides
+        
         for (const auto& p : reference) {
             string nomBase = p->getNom();
             nomBase.erase(nomBase.find_last_not_of(" \n\r\t") + 1);
             if (nomBase == nomPk) {
-                j->ajouterPokemon(new Pokemon(*p));
+                // Créer une copie du Pokémon et l'ajouter à l'équipe
+                Pokemon* copie = nullptr;
+                
+                // Créer la bonne instance en fonction du type
+                if (p->getType1() == "Feu") {
+                    copie = new Feu(p->getNom(), p->getType2(), 
+                                p->getMaxHp(), p->getAttaque(), 
+                                p->getPuissance());
+                } else if (p->getType1() == "Eau") {
+                    copie = new Eau(p->getNom(), p->getType2(), 
+                                 p->getMaxHp(), p->getAttaque(), 
+                                 p->getPuissance());
+                } else if (p->getType1() == "Plante") {
+                    copie = new Plante(p->getNom(), p->getType2(), 
+                                   p->getMaxHp(), p->getAttaque(), 
+                                   p->getPuissance());
+                } else if (p->getType1() == "Electrik") {
+                    copie = new Electrik(p->getNom(), p->getType2(), 
+                                     p->getMaxHp(), p->getAttaque(), 
+                                     p->getPuissance());
+                } else if (p->getType1() == "Normal") {
+                    copie = new Normal(p->getNom(), p->getType2(), 
+                                   p->getMaxHp(), p->getAttaque(), 
+                                   p->getPuissance());
+                } else if (p->getType1() == "Psy") {
+                    copie = new Psy(p->getNom(), p->getType2(), 
+                                p->getMaxHp(), p->getAttaque(), 
+                                p->getPuissance());
+                } else if (p->getType1() == "Poison") {
+                    copie = new Poison(p->getNom(), p->getType2(), 
+                                   p->getMaxHp(), p->getAttaque(), 
+                                   p->getPuissance());
+                } else if (p->getType1() == "Insecte") {
+                    copie = new Insecte(p->getNom(), p->getType2(), 
+                                    p->getMaxHp(), p->getAttaque(), 
+                                    p->getPuissance());
+                } else if (p->getType1() == "Sol") {
+                    copie = new Sol(p->getNom(), p->getType2(), 
+                                p->getMaxHp(), p->getAttaque(), 
+                                p->getPuissance());
+                } else if (p->getType1() == "Roche") {
+                    copie = new Roche(p->getNom(), p->getType2(), 
+                                  p->getMaxHp(), p->getAttaque(), 
+                                  p->getPuissance());
+                } else if (p->getType1() == "Glace") {
+                    copie = new Glace(p->getNom(), p->getType2(), 
+                                  p->getMaxHp(), p->getAttaque(), 
+                                  p->getPuissance());
+                } else if (p->getType1() == "Dragon") {
+                    copie = new Dragon(p->getNom(), p->getType2(), 
+                                   p->getMaxHp(), p->getAttaque(), 
+                                   p->getPuissance());
+                } else if (p->getType1() == "Spectre") {
+                    copie = new Spectre(p->getNom(), p->getType2(), 
+                                    p->getMaxHp(), p->getAttaque(), 
+                                    p->getPuissance());
+                } else if (p->getType1() == "Combat") {
+                    copie = new Combat(p->getNom(), p->getType2(), 
+                                   p->getMaxHp(), p->getAttaque(), 
+                                   p->getPuissance());
+                } else if (p->getType1() == "Fee" || p->getType1() == "Fée") {
+                    copie = new Fee(p->getNom(), p->getType2(), 
+                                p->getMaxHp(), p->getAttaque(), 
+                                p->getPuissance());
+                } else {
+                    // Type par défaut
+                    copie = new Pokemon(p->getNom(), p->getType1(), 
+                                    p->getType2(), p->getMaxHp(), 
+                                    p->getAttaque(), p->getPuissance());
+                }
+                
+                j->ajouterPokemon(copie);
                 break;
             }
         }
     }
     return j;
+}
+
+// Surcharge de la fonction pour créer un joueur par index
+Joueur* creerJoueurDepuisCSV(const string& chemin, const vector<Pokemon*>& reference, int index) {
+    ifstream fichier(chemin);
+    string ligne;
+    int compteur = 0;
+
+    // Ignorer l'en-tête
+    if (!getline(fichier, ligne)) return nullptr;
+    
+    // Parcourir le fichier jusqu'à l'index demandé
+    while (getline(fichier, ligne)) {
+        if (compteur == index) {
+            stringstream ss(ligne);
+            string nom;
+            getline(ss, nom, ',');
+
+            vector<string> nomsPokemon(6);
+            for (int i = 0; i < 6; ++i) getline(ss, nomsPokemon[i], ',');
+
+            Joueur* j = new Joueur(nom);
+            for (auto nomPk : nomsPokemon) {
+                // Nettoyage des espaces invisibles
+                nomPk.erase(nomPk.find_last_not_of(" \n\r\t") + 1);
+                if (nomPk.empty()) continue;  // Ignorer les emplacements vides
+                
+                for (const auto& p : reference) {
+                    string nomBase = p->getNom();
+                    nomBase.erase(nomBase.find_last_not_of(" \n\r\t") + 1);
+                    if (nomBase == nomPk) {
+                        // Créer une copie du Pokémon et l'ajouter à l'équipe
+                        Pokemon* copie = nullptr;
+                        
+                        // Créer la bonne instance en fonction du type
+                        if (p->getType1() == "Feu") {
+                            copie = new Feu(p->getNom(), p->getType2(), 
+                                        p->getMaxHp(), p->getAttaque(), 
+                                        p->getPuissance());
+                        } else if (p->getType1() == "Eau") {
+                            copie = new Eau(p->getNom(), p->getType2(), 
+                                         p->getMaxHp(), p->getAttaque(), 
+                                         p->getPuissance());
+                        } else if (p->getType1() == "Plante") {
+                            copie = new Plante(p->getNom(), p->getType2(), 
+                                           p->getMaxHp(), p->getAttaque(), 
+                                           p->getPuissance());
+                        } else if (p->getType1() == "Electrik") {
+                            copie = new Electrik(p->getNom(), p->getType2(), 
+                                             p->getMaxHp(), p->getAttaque(), 
+                                             p->getPuissance());
+                        } else if (p->getType1() == "Normal") {
+                            copie = new Normal(p->getNom(), p->getType2(), 
+                                           p->getMaxHp(), p->getAttaque(), 
+                                           p->getPuissance());
+                        } else if (p->getType1() == "Psy") {
+                            copie = new Psy(p->getNom(), p->getType2(), 
+                                        p->getMaxHp(), p->getAttaque(), 
+                                        p->getPuissance());
+                        } else if (p->getType1() == "Poison") {
+                            copie = new Poison(p->getNom(), p->getType2(), 
+                                           p->getMaxHp(), p->getAttaque(), 
+                                           p->getPuissance());
+                        } else if (p->getType1() == "Insecte") {
+                            copie = new Insecte(p->getNom(), p->getType2(), 
+                                            p->getMaxHp(), p->getAttaque(), 
+                                            p->getPuissance());
+                        } else if (p->getType1() == "Sol") {
+                            copie = new Sol(p->getNom(), p->getType2(), 
+                                        p->getMaxHp(), p->getAttaque(), 
+                                        p->getPuissance());
+                        } else if (p->getType1() == "Roche") {
+                            copie = new Roche(p->getNom(), p->getType2(), 
+                                          p->getMaxHp(), p->getAttaque(), 
+                                          p->getPuissance());
+                        } else if (p->getType1() == "Glace") {
+                            copie = new Glace(p->getNom(), p->getType2(), 
+                                          p->getMaxHp(), p->getAttaque(), 
+                                          p->getPuissance());
+                        } else if (p->getType1() == "Dragon") {
+                            copie = new Dragon(p->getNom(), p->getType2(), 
+                                           p->getMaxHp(), p->getAttaque(), 
+                                           p->getPuissance());
+                        } else if (p->getType1() == "Spectre") {
+                            copie = new Spectre(p->getNom(), p->getType2(), 
+                                            p->getMaxHp(), p->getAttaque(), 
+                                            p->getPuissance());
+                        } else if (p->getType1() == "Combat") {
+                            copie = new Combat(p->getNom(), p->getType2(), 
+                                           p->getMaxHp(), p->getAttaque(), 
+                                           p->getPuissance());
+                        } else if (p->getType1() == "Fee" || p->getType1() == "Fée") {
+                            copie = new Fee(p->getNom(), p->getType2(), 
+                                        p->getMaxHp(), p->getAttaque(), 
+                                        p->getPuissance());
+                        } else {
+                            // Type par défaut
+                            copie = new Pokemon(p->getNom(), p->getType1(), 
+                                            p->getType2(), p->getMaxHp(), 
+                                            p->getAttaque(), p->getPuissance());
+                        }
+                        
+                        j->ajouterPokemon(copie);
+                        break;
+                    }
+                }
+            }
+            return j;
+        }
+        ++compteur;
+    }
+    return nullptr;  // Si l'index n'existe pas
 }
 
 vector<Entraineur*> chargerEntraineursDepuisCSV(const string& chemin, const vector<Pokemon*>& reference, bool estMaitre) {
@@ -115,11 +300,84 @@ vector<Entraineur*> chargerEntraineursDepuisCSV(const string& chemin, const vect
         for (auto nomPk : nomsPokemon) {
             // Nettoyage des espaces invisibles
             nomPk.erase(nomPk.find_last_not_of(" \n\r\t") + 1);
+            if (nomPk.empty()) continue;  // Ignorer les emplacements vides
+            
             for (const auto& p : reference) {
                 string nomBase = p->getNom();
                 nomBase.erase(nomBase.find_last_not_of(" \n\r\t") + 1);
                 if (nomBase == nomPk) {
-                    e->ajouterPokemon(new Pokemon(*p));
+                    // Créer une copie du Pokémon et l'ajouter à l'équipe
+                    Pokemon* copie = nullptr;
+                    
+                    // Créer la bonne instance en fonction du type
+                    if (p->getType1() == "Feu") {
+                        copie = new Feu(p->getNom(), p->getType2(), 
+                                    p->getMaxHp(), p->getAttaque(), 
+                                    p->getPuissance());
+                    } else if (p->getType1() == "Eau") {
+                        copie = new Eau(p->getNom(), p->getType2(), 
+                                     p->getMaxHp(), p->getAttaque(), 
+                                     p->getPuissance());
+                    } else if (p->getType1() == "Plante") {
+                        copie = new Plante(p->getNom(), p->getType2(), 
+                                       p->getMaxHp(), p->getAttaque(), 
+                                       p->getPuissance());
+                    } else if (p->getType1() == "Electrik") {
+                        copie = new Electrik(p->getNom(), p->getType2(), 
+                                         p->getMaxHp(), p->getAttaque(), 
+                                         p->getPuissance());
+                    } else if (p->getType1() == "Normal") {
+                        copie = new Normal(p->getNom(), p->getType2(), 
+                                       p->getMaxHp(), p->getAttaque(), 
+                                       p->getPuissance());
+                    } else if (p->getType1() == "Psy") {
+                        copie = new Psy(p->getNom(), p->getType2(), 
+                                    p->getMaxHp(), p->getAttaque(), 
+                                    p->getPuissance());
+                    } else if (p->getType1() == "Poison") {
+                        copie = new Poison(p->getNom(), p->getType2(), 
+                                       p->getMaxHp(), p->getAttaque(), 
+                                       p->getPuissance());
+                    } else if (p->getType1() == "Insecte") {
+                        copie = new Insecte(p->getNom(), p->getType2(), 
+                                        p->getMaxHp(), p->getAttaque(), 
+                                        p->getPuissance());
+                    } else if (p->getType1() == "Sol") {
+                        copie = new Sol(p->getNom(), p->getType2(), 
+                                    p->getMaxHp(), p->getAttaque(), 
+                                    p->getPuissance());
+                    } else if (p->getType1() == "Roche") {
+                        copie = new Roche(p->getNom(), p->getType2(), 
+                                      p->getMaxHp(), p->getAttaque(), 
+                                      p->getPuissance());
+                    } else if (p->getType1() == "Glace") {
+                        copie = new Glace(p->getNom(), p->getType2(), 
+                                      p->getMaxHp(), p->getAttaque(), 
+                                      p->getPuissance());
+                    } else if (p->getType1() == "Dragon") {
+                        copie = new Dragon(p->getNom(), p->getType2(), 
+                                       p->getMaxHp(), p->getAttaque(), 
+                                       p->getPuissance());
+                    } else if (p->getType1() == "Spectre") {
+                        copie = new Spectre(p->getNom(), p->getType2(), 
+                                        p->getMaxHp(), p->getAttaque(), 
+                                        p->getPuissance());
+                    } else if (p->getType1() == "Combat") {
+                        copie = new Combat(p->getNom(), p->getType2(), 
+                                       p->getMaxHp(), p->getAttaque(), 
+                                       p->getPuissance());
+                    } else if (p->getType1() == "Fee" || p->getType1() == "Fée") {
+                        copie = new Fee(p->getNom(), p->getType2(), 
+                                    p->getMaxHp(), p->getAttaque(), 
+                                    p->getPuissance());
+                    } else {
+                        // Type par défaut
+                        copie = new Pokemon(p->getNom(), p->getType1(), 
+                                        p->getType2(), p->getMaxHp(), 
+                                        p->getAttaque(), p->getPuissance());
+                    }
+                    
+                    e->ajouterPokemon(copie);
                     break;
                 }
             }

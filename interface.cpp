@@ -285,13 +285,13 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
         std::cout << "0. Quitter" << std::endl;
         std::cout << "1. Afficher l'equipe" << std::endl;
         std::cout << "2. Soigner les Pokemon" << std::endl;
-        std::cout << "3. Modifier l'ordre" << std::endl;
+        std::cout << "3. Gestion de l'entraineur" << std::endl;
         std::cout << "4. Voir les statistiques" << std::endl;
         std::cout << "5. Combattre un leader" << std::endl;
         std::cout << "6. Interagir avec un Pokémon" << std::endl;
         std::cout << "7. Affronter un Maître Pokémon" << std::endl;
         std::cout << "8. Afficher les leaders battus" << std::endl;
-        std::cout << "9. 💾 Sauvegarder" << std::endl;
+        std::cout << "9. 💾 Sauvegarder la partie" << std::endl;
 
         std::cout << std::endl << "Votre choix : ";
         int choix;
@@ -322,24 +322,7 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                 break;
             }
             case 3: {
-                clearScreen();
-                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-                std::cout << "|     MODIFICATION DE L'ORDRE          |" << std::endl;
-                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-            
-                joueur->afficherEquipe();
-            
-                int i, j;
-                std::cout << "\nEntrez le numéro du 1er Pokémon à échanger (1-6) : ";
-                std::cin >> i;
-                std::cout << "Entrez le numéro du 2e Pokémon à échanger (1-6) : ";
-                std::cin >> j;
-            
-                joueur->echangerPokemon(i - 1, j - 1);
-            
-                std::cout << "\nNouvelle composition de l'équipe :\n";
-                joueur->afficherEquipe();
-                waitForEnter();
+                menuGestionEntraineur(joueur, cataloguePokemon);
                 break;
             }
             case 4:
@@ -462,6 +445,291 @@ void choisirPokemonActif(Joueur& joueur) {
         } else {
             std::cout << "Entrée invalide. Essayez encore.\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+    }
+}
+void menuGestionEntraineur(Joueur*& joueur, std::vector<Pokemon*>& cataloguePokemon) {
+    bool retourMenu = false;
+    
+    while (!retourMenu) {
+        clearScreen();
+        std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+        std::cout << "|           GESTION DE L'ENTRAINEUR              |" << std::endl;
+        std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+        
+        std::cout << "Entraîneur actuel : " << joueur->getNom() << std::endl;
+        std::cout << "Options disponibles :" << std::endl;
+        std::cout << "1. Modifier l'ordre des Pokémon" << std::endl;
+        std::cout << "2. Choisir un autre entraîneur depuis le CSV" << std::endl;
+        std::cout << "3. Créer un nouvel entraîneur" << std::endl;
+        std::cout << "0. Retour au menu principal" << std::endl;
+        
+        std::cout << "\nVotre choix : ";
+        int choix;
+        std::cin >> choix;
+        
+        switch (choix) {
+            case 0:
+                retourMenu = true;
+                break;
+                
+            case 1: {
+                // Modifier l'ordre des Pokémon
+                clearScreen();
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                std::cout << "|     MODIFICATION DE L'ORDRE          |" << std::endl;
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+            
+                joueur->afficherEquipe();
+            
+                int i, j;
+                std::cout << "\nEntrez le numéro du 1er Pokémon à échanger (1-6) : ";
+                std::cin >> i;
+                std::cout << "Entrez le numéro du 2e Pokémon à échanger (1-6) : ";
+                std::cin >> j;
+            
+                if (i >= 1 && i <= joueur->getTailleEquipe() && 
+                    j >= 1 && j <= joueur->getTailleEquipe()) {
+                    joueur->echangerPokemon(i - 1, j - 1);
+                    
+                    std::cout << "\nNouvelle composition de l'équipe :\n";
+                    joueur->afficherEquipe();
+                } else {
+                    std::cout << "\nNuméro(s) invalide(s). Veuillez choisir entre 1 et " 
+                              << joueur->getTailleEquipe() << "." << std::endl;
+                }
+                
+                waitForEnter();
+                break;
+            }
+                
+            case 2: {
+                // Choisir un entraîneur depuis le CSV
+                clearScreen();
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                std::cout << "|     CHOIX D'UN ENTRAINEUR           |" << std::endl;
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                
+                // Charger la liste des entraîneurs depuis joueur.csv
+                std::vector<std::string> nomsEntraineurs;
+                std::ifstream fichier("joueur.csv");
+                std::string ligne;
+                
+                // Ignorer l'en-tête
+                std::getline(fichier, ligne);
+                
+                int index = 1;
+                while (std::getline(fichier, ligne)) {
+                    std::stringstream ss(ligne);
+                    std::string nom;
+                    std::getline(ss, nom, ',');  // Le nom est le premier champ
+                    
+                    nomsEntraineurs.push_back(nom);
+                    std::cout << index << ". " << nom << std::endl;
+                    index++;
+                }
+                
+                fichier.close();
+                
+                if (nomsEntraineurs.empty()) {
+                    std::cout << "Aucun entraîneur trouvé dans le fichier CSV." << std::endl;
+                    waitForEnter();
+                    break;
+                }
+                
+                std::cout << "\nChoisissez un entraîneur (0 pour annuler) : ";
+                int choixEntraineur;
+                std::cin >> choixEntraineur;
+                
+                if (choixEntraineur > 0 && choixEntraineur <= static_cast<int>(nomsEntraineurs.size())) {
+                    // Libérer l'entraîneur actuel et créer le nouveau
+                    delete joueur;
+                    joueur = creerJoueurDepuisCSV("joueur.csv", cataloguePokemon, choixEntraineur - 1);
+                    
+                    if (joueur) {
+                        std::cout << "Vous êtes maintenant " << joueur->getNom() << "." << std::endl;
+                    } else {
+                        std::cerr << "Erreur lors du chargement de l'entraîneur. Création d'un entraîneur par défaut." << std::endl;
+                        joueur = new Joueur("Dresseur");
+                    }
+                }
+                
+                waitForEnter();
+                break;
+            }
+                
+            case 3: {
+                // Créer un nouvel entraîneur avec des Pokémon par numéro de Pokédex
+                clearScreen();
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                std::cout << "|     CREATION D'UN ENTRAINEUR         |" << std::endl;
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                
+                std::string nouveauNom;
+                std::cout << "Entrez le nom du nouvel entraîneur : ";
+                std::cin.ignore();  // Pour ignorer le \n restant
+                std::getline(std::cin, nouveauNom);
+                
+                // Créer le nouvel entraîneur
+                Joueur* nouvelEntraineur = new Joueur(nouveauNom);
+                
+                // Afficher le catalogue des Pokémon disponibles
+                std::cout << "\nCatalogue des Pokémon disponibles :" << std::endl;
+                std::cout << "--------------------------------------" << std::endl;
+                for (size_t i = 0; i < cataloguePokemon.size(); ++i) {
+                    std::cout << (i + 1) << ". " << cataloguePokemon[i]->getNom() 
+                              << " [" << cataloguePokemon[i]->getType1();
+                    
+                    if (!cataloguePokemon[i]->getType2().empty()) {
+                        std::cout << "/" << cataloguePokemon[i]->getType2();
+                    }
+                    
+                    std::cout << "]" << std::endl;
+                }
+                
+                // Sélectionner jusqu'à 6 Pokémon
+                std::cout << "\nSélectionnez jusqu'à 6 Pokémon par leur numéro Pokédex (0 pour terminer) :" << std::endl;
+                
+                for (int i = 0; i < 6; ++i) {
+                    std::cout << "Pokémon " << (i + 1) << " (0 pour terminer) : ";
+                    int numPokedex;
+                    std::cin >> numPokedex;
+                    
+                    if (numPokedex == 0) break;
+                    
+                    if (numPokedex > 0 && numPokedex <= static_cast<int>(cataloguePokemon.size())) {
+                        // Créer une copie du Pokémon et l'ajouter à l'équipe
+                        Pokemon* pokemon = cataloguePokemon[numPokedex - 1];
+                        Pokemon* copie = nullptr;
+                        
+                        // Créer la bonne instance en fonction du type
+                        if (pokemon->getType1() == "Feu") {
+                            copie = new Feu(pokemon->getNom(), pokemon->getType2(), 
+                                        pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                        pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Eau") {
+                            copie = new Eau(pokemon->getNom(), pokemon->getType2(), 
+                                         pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                         pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Plante") {
+                            copie = new Plante(pokemon->getNom(), pokemon->getType2(), 
+                                           pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                           pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Electrik") {
+                            copie = new Electrik(pokemon->getNom(), pokemon->getType2(), 
+                                             pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                             pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Normal") {
+                            copie = new Normal(pokemon->getNom(), pokemon->getType2(), 
+                                           pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                           pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Psy") {
+                            copie = new Psy(pokemon->getNom(), pokemon->getType2(), 
+                                        pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                        pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Poison") {
+                            copie = new Poison(pokemon->getNom(), pokemon->getType2(), 
+                                           pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                           pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Insecte") {
+                            copie = new Insecte(pokemon->getNom(), pokemon->getType2(), 
+                                            pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                            pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Sol") {
+                            copie = new Sol(pokemon->getNom(), pokemon->getType2(), 
+                                        pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                        pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Roche") {
+                            copie = new Roche(pokemon->getNom(), pokemon->getType2(), 
+                                          pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                          pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Glace") {
+                            copie = new Glace(pokemon->getNom(), pokemon->getType2(), 
+                                          pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                          pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Dragon") {
+                            copie = new Dragon(pokemon->getNom(), pokemon->getType2(), 
+                                           pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                           pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Spectre") {
+                            copie = new Spectre(pokemon->getNom(), pokemon->getType2(), 
+                                            pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                            pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Combat") {
+                            copie = new Combat(pokemon->getNom(), pokemon->getType2(), 
+                                           pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                           pokemon->getPuissance());
+                        } else if (pokemon->getType1() == "Fee" || pokemon->getType1() == "Fée") {
+                            copie = new Fee(pokemon->getNom(), pokemon->getType2(), 
+                                        pokemon->getMaxHp(), pokemon->getAttaque(), 
+                                        pokemon->getPuissance());
+                        } else {
+                            // Type par défaut
+                            copie = new Pokemon(pokemon->getNom(), pokemon->getType1(), 
+                                            pokemon->getType2(), pokemon->getMaxHp(), 
+                                            pokemon->getAttaque(), pokemon->getPuissance());
+                        }
+                        
+                        nouvelEntraineur->ajouterPokemon(copie);
+                        std::cout << "✅ " << pokemon->getNom() << " ajouté à l'équipe." << std::endl;
+                    } else {
+                        std::cout << "❌ Numéro invalide. Veuillez choisir entre 1 et " 
+                                  << cataloguePokemon.size() << "." << std::endl;
+                        --i;  // Réessayer pour ce slot
+                    }
+                }
+                
+                // Vérifier si l'équipe contient au moins un Pokémon
+                if (nouvelEntraineur->getTailleEquipe() == 0) {
+                    std::cout << "\nL'équipe doit contenir au moins un Pokémon. Création annulée." << std::endl;
+                    delete nouvelEntraineur;
+                } else {
+                    // Remplacer l'entraîneur actuel par le nouveau
+                    delete joueur;
+                    joueur = nouvelEntraineur;
+                    
+                    std::cout << "\nNouvel entraîneur créé avec succès !" << std::endl;
+                    std::cout << "Composition de l'équipe :" << std::endl;
+                    joueur->afficherEquipe();
+                    
+                    // Sauvegarder le nouvel entraîneur dans le CSV
+                    std::cout << "\nVoulez-vous sauvegarder ce nouvel entraîneur dans le fichier joueur.csv ? (1: Oui, 0: Non) : ";
+                    int sauvegarder;
+                    std::cin >> sauvegarder;
+                    
+                    if (sauvegarder == 1) {
+                        // Ajouter l'entraîneur à la fin du fichier
+                        std::ofstream fichier("joueur.csv", std::ios::app);
+                        
+                        if (fichier.is_open()) {
+                            fichier << joueur->getNom();
+                            
+                            // Écrire les noms des Pokémon (jusqu'à 6)
+                            for (int i = 0; i < 6; ++i) {
+                                fichier << ",";
+                                if (i < joueur->getTailleEquipe()) {
+                                    fichier << joueur->pokemonActif(i)->getNom();
+                                }
+                            }
+                            
+                            fichier << std::endl;
+                            fichier.close();
+                            
+                            std::cout << "✅ Entraîneur sauvegardé dans joueur.csv" << std::endl;
+                        } else {
+                            std::cerr << "❌ Erreur lors de l'ouverture du fichier joueur.csv" << std::endl;
+                        }
+                    }
+                }
+                
+                waitForEnter();
+                break;
+            }
+                
+            default:
+                std::cout << "Option invalide. Veuillez réessayer." << std::endl;
+                waitForEnter();
+                break;
         }
     }
 }

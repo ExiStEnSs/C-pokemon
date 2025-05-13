@@ -9,18 +9,6 @@
 #include <fstream>
 #include <sstream>
 
-namespace Color {
-    const std::string RESET = "";
-    const std::string RED = "";
-    const std::string GREEN = "";
-    const std::string YELLOW = "";
-    const std::string BLUE = "";
-    const std::string MAGENTA = "";
-    const std::string CYAN = "";
-    const std::string WHITE = "";
-    const std::string BOLD = "";
-}
-
 void clearScreen() {
     std::cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << std::endl;
 }
@@ -39,33 +27,6 @@ void showDialogBox(const std::string& text) {
     std::cout << "| " << text << std::string(width - text.length() - 4, ' ') << " |" << std::endl;
     std::cout << "+" << std::string(width - 2, '-') << "+" << std::endl;
 }
-void showHPBar(const std::string& name, int current, int max, int width) {
-    float percentage = static_cast<float>(current) / max;
-    int barFill = static_cast<int>(percentage * width);
-    std::cout << name << " HP: [";
-    for (int i = 0; i < barFill; i++) std::cout << "#";
-    for (int i = barFill; i < width; i++) std::cout << "-";
-    std::cout << "] " << current << "/" << max << std::endl;
-}
-void showPokemonCard(const Pokemon* pokemon) {
-    if (!pokemon) return;
-    int width = 30;
-    std::cout << "+" << std::string(width - 2, '=') << "+" << std::endl;
-    std::cout << "| " << pokemon->getNom() << std::string(width - pokemon->getNom().length() - 4, ' ') << " |" << std::endl;
-    std::string typeInfo = "Type: " + pokemon->getType1();
-    if (!pokemon->getType2().empty()) {
-        typeInfo += "/" + pokemon->getType2();
-    }
-    std::cout << "| " << typeInfo << std::string(width - typeInfo.length() - 4, ' ') << " |" << std::endl;
-    std::cout << "|" << std::string(width - 2, '-') << "|" << std::endl;
-    std::string hpInfo = "HP: " + std::to_string(pokemon->getHp()) + "/" + std::to_string(pokemon->getMaxHp());
-    std::cout << "| " << hpInfo << std::string(width - hpInfo.length() - 4, ' ') << " |" << std::endl;
-    std::string attaqueInfo = "Attaque: " + pokemon->getAttaque();
-    std::cout << "| " << attaqueInfo << std::string(width - attaqueInfo.length() - 4, ' ') << " |" << std::endl;
-    std::string puissanceInfo = "Puissance: " + std::to_string(pokemon->getPuissance());
-    std::cout << "| " << puissanceInfo << std::string(width - puissanceInfo.length() - 4, ' ') << " |" << std::endl;
-    std::cout << "+" << std::string(width - 2, '=') << "+" << std::endl;
-}
 void showPokemonList(const Entraineur* entraineur) {
     entraineur->afficherEquipe();
 }
@@ -83,25 +44,6 @@ void showTitleScreen() {
     std::cout << "                  Combat de Pokemon - C++ Edition" << std::endl;
     std::cout << "                       Appuyez sur Entree..." << std::endl;
     std::cin.get();
-}
-void showBattleScreen(const Pokemon* playerPokemon, const Pokemon* enemyPokemon) {
-    clearScreen();
-    std::cout << "ADVERSAIRE" << std::endl;
-    showHPBar(enemyPokemon->getNom(), enemyPokemon->getHp(), enemyPokemon->getMaxHp());
-    std::cout << std::endl;
-    std::cout << std::string(40, ' ') << std::endl;
-    showHPBar(playerPokemon->getNom(), playerPokemon->getHp(), playerPokemon->getMaxHp());
-    std::cout << "VOTRE POKEMON" << std::endl;
-    std::cout << "\n" << std::string(50, '=') << std::endl;
-    std::cout << "Combat en cours..." << std::endl;
-}
-void showAttackAnimation(const std::string& attackName, int damage, bool isSuperEffective) {
-    std::cout << attackName << " !" << std::endl;
-    if (isSuperEffective) {
-        std::cout << "C'est super efficace !" << std::endl;
-    }
-    std::cout << "-" << damage << " PV !" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 void afficherLeadersBattus() {
     clearScreen();

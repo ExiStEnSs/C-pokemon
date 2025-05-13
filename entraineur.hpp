@@ -37,7 +37,6 @@ public:
     void incrementerBadge();
     void enregistrerVictoire();
     void enregistrerDefaite();
-    std::string getRank() const;
     void afficherStats() const;
     int getNombreBadges() const { return nombreBadges; }
     int getVictoires() const { return totalVictoires; }

@@ -22,17 +22,12 @@ void clearScreen();
 void typingEffect(const std::string& text, int delayMs = 30);
 void showDialogBox(const std::string& text);
 void waitForEnter();
-void showHPBar(const std::string& name, int current, int max, int width = 20);
-void showPokemonCard(const Pokemon* pokemon);
 void showPokemonList(const Entraineur* entraineur);
 void showTitleScreen();
-void showBattleScreen(const Pokemon* playerPokemon, const Pokemon* enemyPokemon);
-void showAttackAnimation(const std::string& attackName, int damage, bool isSuperEffective);
 void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector<Entraineur*> maitres, std::vector<Pokemon*>& cataloguePokemon);
 void menuCombat(Joueur& joueur, Entraineur& adversaire);
 void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders);
 void afficherLeadersBattus();
 void menuSauvegardeChargement(Joueur& joueur, std::vector<Pokemon*>& cataloguePokemon, std::vector<Entraineur*>& leaders, std::vector<Entraineur*>& maitres);
 void menuGestionEntraineur(Joueur*& joueur, std::vector<Pokemon*>& cataloguePokemon);
-void choisirPokemonActif(Joueur& joueur);
 #endif

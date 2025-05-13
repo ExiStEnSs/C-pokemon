@@ -495,54 +495,53 @@ void menuInteraction(Joueur& joueur, std::vector<Entraineur*>& leaders, std::vec
                 break;
             }
             
-            case 3: { // Interaction avec un maître Pokémon vaincu depuis fichier
+            case 3: { 
                 clearScreen();
                 std::cout << "+" << std::string(50, '=') << "+" << std::endl;
                 std::cout << "|       INTERACTION AVEC MAÎTRES VAINCUS             |" << std::endl;
                 std::cout << "+" << std::string(50, '=') << "+" << std::endl;
-                
-                // Obtenir les noms des maîtres battus depuis le fichier
                 std::vector<std::string> nomsMaitresBattus = Sauvegarde::extraireNomsMaitresBattus();
-                
+    
                 if (nomsMaitresBattus.empty()) {
-                    std::cout << "Vous n'avez vaincu aucun maître Pokémon." << std::endl;
-                    waitForEnter();
-                    break;
-                }
-                
-                // Trouver les maîtres correspondants dans la liste
-                std::vector<MaitrePokemon*> maitresVaincus;
-                for (const std::string& nomBattu : nomsMaitresBattus) {
-                    for (Entraineur* entraineur : maitres) {
-                        MaitrePokemon* maitre = dynamic_cast<MaitrePokemon*>(entraineur);
-                        if (maitre && maitre->getNom() == nomBattu) {
-                            maitresVaincus.push_back(maitre);
-                            break;
-                        }
-                    }
-                }
-                
-                std::cout << "Maîtres Pokémon vaincus :" << std::endl;
-                std::cout << std::string(40, '-') << std::endl;
-                
-                for (size_t i = 0; i < maitresVaincus.size(); ++i) {
-                    std::cout << (i + 1) << ". Maître " << maitresVaincus[i]->getNom() << std::endl;
-                }
-                
-                std::cout << "\nChoisissez un maître (1-" << maitresVaincus.size() 
-                          << ", 0 pour retour) : ";
-                int choixMaitre;
-                std::cin >> choixMaitre;
-                
-                if (choixMaitre > 0 && choixMaitre <= static_cast<int>(maitresVaincus.size())) {
-                    MaitrePokemon* maitre = maitresVaincus[choixMaitre - 1];
-                    std::cout << "\n" << std::string(40, '=') << std::endl;
-                    std::cout << "🗣️ " << maitre->interaction() << std::endl;
-                    std::cout << std::string(40, '=') << std::endl;
-                }
+                std::cout << "Vous n'avez vaincu aucun maître Pokémon." << std::endl;
                 waitForEnter();
                 break;
             }
+            std::cout << "Maîtres Pokémon vaincus :" << std::endl;
+            std::cout << std::string(40, '-') << std::endl;
+            for (size_t i = 0; i < nomsMaitresBattus.size(); ++i) {
+                std::cout << (i + 1) << ". Maître " << nomsMaitresBattus[i] << std::endl;
+            }
+    
+            std::cout << "\nChoisissez un maître (1-" << nomsMaitresBattus.size() << ", 0 pour retour) : ";
+            int choixMaitre;
+            std::cin >> choixMaitre;
+    
+            if (choixMaitre > 0 && choixMaitre <= static_cast<int>(nomsMaitresBattus.size())) {
+            std::string nomMaitre = nomsMaitresBattus[choixMaitre - 1];
+            MaitrePokemon* maitreTrouve = nullptr;
+            for (Entraineur* entraineur : maitres) {
+                MaitrePokemon* maitre = dynamic_cast<MaitrePokemon*>(entraineur);
+                if (maitre && maitre->getNom() == nomMaitre) {
+                    maitreTrouve = maitre;
+                    break;
+                }
+            }
+        
+        if (maitreTrouve) {
+            std::cout << "\n" << std::string(40, '=') << std::endl;
+            std::cout << "🗣️ " << maitreTrouve->interaction() << std::endl;
+            std::cout << std::string(40, '=') << std::endl;
+        } else {
+            // Si le maître n'est pas trouvé dans la liste, créer une interaction générique
+            std::cout << "\n" << std::string(40, '=') << std::endl;
+            std::cout << "🗣️ Maître " << nomMaitre << " dit : \"Félicitations, tu es digne de la Ligue Pokémon.\"" << std::endl;
+            std::cout << std::string(40, '=') << std::endl;
+        }
+    }
+    waitForEnter();
+    break;
+}
             
             case 4: { // Afficher la liste des leaders battus
                 clearScreen();

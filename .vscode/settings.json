@@ -58,7 +58,8 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "cstdarg": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "set": "cpp"
     },
     "git.ignoreLimitWarning": true
 }

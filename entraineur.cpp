@@ -1,5 +1,6 @@
 #include "entraineur.hpp"
 #include <iostream>
+
 Entraineur::Entraineur(const std::string& nom) : nom(nom), indexPokemonActif(0) {}
 Entraineur::~Entraineur() {
     for (auto creature : equipe) {

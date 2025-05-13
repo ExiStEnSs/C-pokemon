@@ -171,8 +171,6 @@ void demarrerCombat(Entraineur& joueur, Entraineur& adversaire) {
         if (j) {
             j->enregistrerVictoire();
             j->enregistrerVaincu(&adversaire);
-            
-            // Vérifier le type d'adversaire et sauvegarder approprié
             MaitrePokemon* maitre = dynamic_cast<MaitrePokemon*>(&adversaire);
             LeaderGym* leader = dynamic_cast<LeaderGym*>(&adversaire);
             

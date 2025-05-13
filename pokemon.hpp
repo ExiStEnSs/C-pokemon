@@ -1,6 +1,5 @@
 #ifndef POKEMON_HPP
 #define POKEMON_HPP
-
 #include "interagir.hpp"
 #include <string>
 #include <vector>
@@ -15,7 +14,6 @@ protected:
     int pointsDeVieMax;
     std::string nomAttaque;
     int degatsAttaque;
-    int niveau;
 
 public:
     Pokemon(const std::string& nom, const std::string& type1, const std::string& type2, int hp, const std::string& attaque, int puissance);
@@ -28,7 +26,6 @@ public:
     int getMaxHp() const;
     std::string getAttaque() const;
     int getPuissance() const;
-    int getNiveau() const;
 
     void subirDegats(int quantite);
     bool estKo() const;

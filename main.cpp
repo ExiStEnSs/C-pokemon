@@ -7,7 +7,6 @@
 #include "combat.hpp"
 #include "interface.hpp"
 #include "sauvegarde.hpp"
-
 using namespace std;
 
 vector<Pokemon*> importerPokemonDepuisCSV(const string& cheminFichier) {
@@ -455,10 +454,37 @@ int main() {
         joueur->afficherStats();
         waitForEnter();
     } else {
-        // Nouvelle partie
-        Sauvegarde::reinitialisationNouvellePartie();
-        std::cout << "Nouvelle partie initialisée." << std::endl;
-        waitForEnter();
+        std::cout << "🔄 Réinitialisation en cours..." << std::endl;
+    
+    // 1. Sauvegarder l'index du joueur actuel
+    string nomJoueurActuel = joueur->getNom();
+    vector<string> nomsJoueurs = listerJoueursDisponibles("joueur.csv");
+    int indexJoueur = 0;
+    
+    for (size_t i = 0; i < nomsJoueurs.size(); ++i) {
+        if (nomsJoueurs[i] == nomJoueurActuel) {
+            indexJoueur = i;
+            break;
+        }
+    }
+    
+    // 2. Réinitialiser le fichier
+    Sauvegarde::reinitialisationNouvellePartie();
+    
+    // 3. Supprimer et recréer le joueur
+    delete joueur;
+    joueur = creerJoueurDepuisCSV("joueur.csv", baseDeDonnees, indexJoueur);
+    
+    if (joueur) {
+        std::cout << "✅ Nouvelle partie initialisée !" << std::endl;
+        std::cout << "📊 Statistiques remises à zéro :" << std::endl;
+        joueur->afficherStats();
+    } else {
+        std::cerr << "❌ Erreur lors de la création d'une nouvelle partie." << std::endl;
+        return -1;
+    }
+    
+    waitForEnter();
     }
 
     vector<Entraineur*> leaders = chargerEntraineursDepuisCSV("leaders.csv", baseDeDonnees, false);
@@ -467,10 +493,33 @@ int main() {
     clearScreen();
     interfaceUtilisateur(joueur, leaders, maitres, baseDeDonnees);
 
-    for (auto& p : baseDeDonnees) delete p;
-    for (auto& l : leaders) delete l;
-    for (auto& m : maitres) delete m;
-    delete joueur;
-
+    for (auto& l : leaders) {
+        if (l != nullptr) {
+            delete l;
+            l = nullptr;
+        }
+    }
+    leaders.clear();
+    
+    for (auto& m : maitres) {
+        if (m != nullptr) {
+            delete m;
+            m = nullptr;
+        }
+    }
+    maitres.clear();
+    
+    for (auto& p : baseDeDonnees) {
+        if (p != nullptr) {
+            delete p;
+            p = nullptr;
+        }
+    }
+    baseDeDonnees.clear();
+    
+    if (joueur != nullptr) {
+        delete joueur;
+        joueur = nullptr;
+    }    
     return 0;
 }

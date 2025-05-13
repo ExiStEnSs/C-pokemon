@@ -5,6 +5,7 @@
 #include <chrono>
 #include <iomanip>
 #include <algorithm>
+using namespace std;
 
 // Définir les constantes de chemins de fichiers
 const std::string Sauvegarde::FICHIER_LEADERS_BATTUS = "save/leaders_battus.txt";

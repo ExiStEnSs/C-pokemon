@@ -3,7 +3,7 @@
 #include <iostream>
 
 Pokemon::Pokemon(const std::string& nom, const std::string& type1, const std::string& type2, int hp, const std::string& attaque, int puissance)
-    : nom(nom), typePrincipal(type1), typeSecondaire(type2), pointsDeVie(hp), pointsDeVieMax(hp), nomAttaque(attaque), degatsAttaque(puissance), niveau(1) {
+    : nom(nom), typePrincipal(type1), typeSecondaire(type2), pointsDeVie(hp), pointsDeVieMax(hp), nomAttaque(attaque), degatsAttaque(puissance){
 }
 
 std::string Pokemon::getNom() const {
@@ -32,10 +32,6 @@ std::string Pokemon::getAttaque() const {
 
 int Pokemon::getPuissance() const {
     return degatsAttaque;
-}
-
-int Pokemon::getNiveau() const {
-    return niveau;
 }
 
 void Pokemon::subirDegats(int quantite) {

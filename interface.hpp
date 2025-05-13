@@ -30,4 +30,5 @@ void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders);
 void afficherLeadersBattus();
 void menuSauvegardeChargement(Joueur& joueur, std::vector<Pokemon*>& cataloguePokemon, std::vector<Entraineur*>& leaders, std::vector<Entraineur*>& maitres);
 void menuGestionEntraineur(Joueur*& joueur, std::vector<Pokemon*>& cataloguePokemon);
+void menuInteraction(Joueur& joueur, std::vector<Entraineur*>& leaders, std::vector<Entraineur*>& maitres);
 #endif

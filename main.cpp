@@ -227,30 +227,30 @@ Joueur* creerJoueurDepuisCSV(const string& chemin, const vector<Pokemon*>& refer
 // Fonction pour choisir un joueur au début
 Joueur* choisirJoueur(const string& chemin, const vector<Pokemon*>& reference) {
     clearScreen();
-    std::cout << "+" << std::string(50, '=') << "+" << std::endl;
-    std::cout << "|           SÉLECTION DU DRESSEUR POKÉMON            |" << std::endl;
-    std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+    cout << "+" << string(50, '=') << "+" << endl;
+    cout << "|           SÉLECTION DU DRESSEUR POKÉMON            |" << endl;
+    cout << "+" << string(50, '=') << "+" << endl;
     
     // Lister tous les joueurs disponibles
     vector<string> nomsJoueurs = listerJoueursDisponibles(chemin);
     
     if (nomsJoueurs.empty()) {
-        std::cout << "❌ Aucun joueur trouvé dans le fichier " << chemin << std::endl;
+        cout << "❌ Aucun joueur trouvé dans le fichier " << chemin << endl;
         return nullptr;
     }
     
-    std::cout << "\nJoueurs disponibles :" << std::endl;
-    std::cout << std::string(40, '-') << std::endl;
+    cout << "\nJoueurs disponibles :" << endl;
+    cout << string(40, '-') << endl;
     
     for (size_t i = 0; i < nomsJoueurs.size(); ++i) {
-        std::cout << (i + 1) << ". 👤 " << nomsJoueurs[i] << std::endl;
+        cout << (i + 1) << ". 👤 " << nomsJoueurs[i] << endl;
     }
     
-    std::cout << std::string(40, '-') << std::endl;
-    std::cout << "\nChoisissez votre dresseur (1-" << nomsJoueurs.size() << ") : ";
+    cout << string(40, '-') << endl;
+    cout << "\nChoisissez votre dresseur (1-" << nomsJoueurs.size() << ") : ";
     
     int choix;
-    std::cin >> choix;
+    cin >> choix;
     
     if (choix >= 1 && choix <= static_cast<int>(nomsJoueurs.size())) {
         // Créer le joueur choisi
@@ -258,18 +258,18 @@ Joueur* choisirJoueur(const string& chemin, const vector<Pokemon*>& reference) {
         
         if (joueur) {
             clearScreen();
-            std::cout << "✅ Vous avez choisi : " << joueur->getNom() << std::endl;
-            std::cout << "\nVotre équipe :" << std::endl;
+            cout << "✅ Vous avez choisi : " << joueur->getNom() << endl;
+            cout << "\nVotre équipe :" << endl;
             joueur->afficherEquipe();
             waitForEnter();
             return joueur;
         } else {
-            std::cout << "❌ Erreur lors du chargement du joueur." << std::endl;
+            cout << "❌ Erreur lors du chargement du joueur." << endl;
             waitForEnter();
             return nullptr;
         }
     } else {
-        std::cout << "❌ Choix invalide. Retour au premier joueur." << std::endl;
+        cout << "❌ Choix invalide. Retour au premier joueur." << endl;
         waitForEnter();
         return creerJoueurDepuisCSV(chemin, reference, 0);
     }
@@ -408,32 +408,32 @@ int main() {
     Joueur* joueur = choisirJoueur("joueur.csv", baseDeDonnees);
     
     if (!joueur) {
-        std::cerr << "❌ Erreur fatale : Impossible de charger un joueur." << std::endl;
+        cerr << "❌ Erreur fatale : Impossible de charger un joueur." << endl;
         return -1;
     }
 
     // 🔍 Vérification importante : l'équipe est-elle déjà chargée ?
-    std::cout << "👤 Joueur sélectionné : " << joueur->getNom() << std::endl;
-    std::cout << "📊 Équipe actuelle : " << joueur->getTailleEquipe() << " Pokémon" << std::endl;
+    cout << "👤 Joueur sélectionné : " << joueur->getNom() << endl;
+    cout << "📊 Équipe actuelle : " << joueur->getTailleEquipe() << " Pokémon" << endl;
 
     // Si l'équipe est vide, c'est normal, sinon c'est déjà chargé
     if (joueur->getTailleEquipe() > 0) {
-        std::cout << "✅ Équipe déjà chargée depuis le CSV !" << std::endl;
-        std::cout << "Premier Pokémon : " << joueur->pokemonActif()->getNom() << std::endl;
+        cout << "✅ Équipe déjà chargée depuis le CSV !" << endl;
+        cout << "Premier Pokémon : " << joueur->pokemonActif()->getNom() << endl;
     }
 
     // Gestion de la sauvegarde/chargement
     clearScreen();
-    std::cout << "+" << std::string(50, '=') << "+" << std::endl;
-    std::cout << "|      SIMULATEUR DE COMBAT POKÉMON - C++ EDITION     |" << std::endl;
-    std::cout << "+" << std::string(50, '=') << "+" << std::endl;
-    std::cout << "\nJoueur sélectionné : " << joueur->getNom() << std::endl;
-    std::cout << "\nVoulez-vous charger une partie sauvegardée ?\n" << std::endl;
-    std::cout << "1. 📂 Oui, charger ma partie sauvegardée" << std::endl;
-    std::cout << "0. 🆕 Non, commencer une nouvelle partie" << std::endl;
-    std::cout << "\nVotre choix : ";
+    cout << "+" << string(50, '=') << "+" << endl;
+    cout << "|      SIMULATEUR DE COMBAT POKÉMON - C++ EDITION     |" << endl;
+    cout << "+" << string(50, '=') << "+" << endl;
+    cout << "\nJoueur sélectionné : " << joueur->getNom() << endl;
+    cout << "\nVoulez-vous charger une partie sauvegardée ?\n" << endl;
+    cout << "1. 📂 Oui, charger ma partie sauvegardée" << endl;
+    cout << "0. 🆕 Non, commencer une nouvelle partie" << endl;
+    cout << "\nVotre choix : ";
     int charger;
-    std::cin >> charger;
+    cin >> charger;
     
     if (charger == 1) {
         // IMPORTANT : Ne pas recharger si l'équipe est déjà correcte
@@ -441,20 +441,20 @@ int main() {
             bool chargementReussi = Sauvegarde::chargerPartie(*joueur, baseDeDonnees);
             
             if (chargementReussi) {
-                std::cout << "✅ Partie chargée avec succès !" << std::endl;
-                std::cout << "📊 Équipe après chargement : " << joueur->getTailleEquipe() << " Pokémon" << std::endl;
+                cout << "✅ Partie chargée avec succès !" << endl;
+                cout << "📊 Équipe après chargement : " << joueur->getTailleEquipe() << " Pokémon" << endl;
             } else {
-                std::cout << "❌ Impossible de charger la partie." << std::endl;
+                cout << "❌ Impossible de charger la partie." << endl;
             }
         } else {
-            std::cout << "✅ Partie chargée avec succès !" << std::endl;
+            cout << "✅ Partie chargée avec succès !" << endl;
         }
         
         // Afficher les statistiques
         joueur->afficherStats();
         waitForEnter();
     } else {
-        std::cout << "🔄 Réinitialisation en cours..." << std::endl;
+        cout << "🔄 Réinitialisation en cours..." << endl;
     
     // 1. Sauvegarder l'index du joueur actuel
     string nomJoueurActuel = joueur->getNom();
@@ -476,11 +476,11 @@ int main() {
     joueur = creerJoueurDepuisCSV("joueur.csv", baseDeDonnees, indexJoueur);
     
     if (joueur) {
-        std::cout << "✅ Nouvelle partie initialisée !" << std::endl;
-        std::cout << "📊 Statistiques remises à zéro :" << std::endl;
+        cout << "✅ Nouvelle partie initialisée !" << endl;
+        cout << "📊 Statistiques remises à zéro :" << endl;
         joueur->afficherStats();
     } else {
-        std::cerr << "❌ Erreur lors de la création d'une nouvelle partie." << std::endl;
+        cerr << "❌ Erreur lors de la création d'une nouvelle partie." << endl;
         return -1;
     }
     

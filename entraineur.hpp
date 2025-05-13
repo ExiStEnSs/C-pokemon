@@ -44,6 +44,7 @@ public:
     void enregistrerVaincu(Entraineur* adversaire);
     void interagirAvecVaincus() const;
     std::string interaction() const override;
+    const std::vector<Entraineur*>& getAdversairesVaincus() const { return adversairesVaincus; }
 };
 class LeaderGym : public Entraineur {
 private:

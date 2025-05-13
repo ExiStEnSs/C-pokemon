@@ -62,36 +62,100 @@ void afficherLeadersBattus() {
 }
 void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders) {
     clearScreen();
-    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-    std::cout << "|       CHOIX DU LEADER DE GYM        |" << std::endl;
-    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+    std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+    std::cout << "|            CHOIX DU LEADER DE GYM              |" << std::endl;
+    std::cout << "+" << std::string(50, '=') << "+" << std::endl;
     if (leaders.empty()) {
         std::cout << "Aucun leader disponible." << std::endl;
         waitForEnter();
         return;
     }
+    
+    // Obtenir la liste des leaders déjà battus
+    std::vector<std::string> nomsLeadersBattus = Sauvegarde::extraireNomsLeadersBattus();
+    
     std::cout << "Leaders disponibles :" << std::endl;
+    std::cout << std::string(45, '-') << std::endl;
+    
     for (size_t i = 0; i < leaders.size(); ++i) {
         LeaderGym* leader = dynamic_cast<LeaderGym*>(leaders[i]);
         if (leader) {
-            std::cout << (i + 1) << ". " << leader->getNom() << " (Arène de " << leader->getNomGym() << ")" << std::endl;
+            std::cout << (i + 1) << ". " << leader->getNom() << " (Arène de " << leader->getNomGym() << ")";
+            
+            // Vérifier si ce leader a déjà été battu
+            bool dejaBattu = false;
+            for (const auto& nomBattu : nomsLeadersBattus) {
+                if (nomBattu == leader->getNom()) {
+                    dejaBattu = true;
+                    break;
+                }
+            }
+            
+            if (dejaBattu) {
+                std::cout << " ✅ [BADGE OBTENU]";
+            } else {
+                std::cout << " 🏅 [BADGE DISPONIBLE]";
+            }
+            std::cout << std::endl;
         } else {
             std::cout << (i + 1) << ". " << leaders[i]->getNom() << std::endl;
         }
     }
+    
+    std::cout << std::string(45, '-') << std::endl;
+    std::cout << "📊 Badges actuels : " << joueur.getNombreBadges() << "/4" << std::endl;
     std::cout << "\nVotre choix (0 pour revenir) : ";
     int choix;
     std::cin >> choix;
+    
     if (choix > 0 && choix <= static_cast<int>(leaders.size())) {
-        int victoires_avant = joueur.getVictoires();
-        menuCombat(joueur, *leaders[choix - 1]);
-        if (joueur.getVictoires() > victoires_avant) {
-            Sauvegarde::sauvegarderLeaderBattu(joueur, leaders[choix - 1]);
-            LeaderGym* gym_leader = dynamic_cast<LeaderGym*>(leaders[choix - 1]);
-            if (gym_leader) {
-                joueur.incrementerBadge();
-                std::cout << "🎖️ Vous avez obtenu le badge : " << gym_leader->getMedaille() << " !" << std::endl;
+        LeaderGym* gym_leader = dynamic_cast<LeaderGym*>(leaders[choix - 1]);
+        
+        // Vérifier si ce leader a déjà été battu AVANT le combat
+        bool dejaBattuAvant = false;
+        if (gym_leader) {
+            for (const auto& nomBattu : nomsLeadersBattus) {
+                if (nomBattu == gym_leader->getNom()) {
+                    dejaBattuAvant = true;
+                    break;
+                }
             }
+        }
+        
+        if (dejaBattuAvant) {
+            std::cout << "\n⚠️  Attention : Vous avez déjà battu ce leader et obtenu son badge." << std::endl;
+            std::cout << "Voulez-vous le défier à nouveau ? (1: Oui, 0: Non) : ";
+            int refaire;
+            std::cin >> refaire;
+            if (refaire != 1) {
+                return;
+            }
+        }
+        
+        int victoires_avant = joueur.getVictoires();
+        int badges_avant = joueur.getNombreBadges();
+        
+        // Démarrer le combat
+        menuCombat(joueur, *leaders[choix - 1]);
+        
+        // Vérifier si le combat a été gagné
+        if (joueur.getVictoires() > victoires_avant) {
+            if (gym_leader) {
+                // Sauvegarder uniquement si c'est la première victoire
+                if (!dejaBattuAvant) {
+                    Sauvegarde::sauvegarderLeaderBattu(joueur, leaders[choix - 1]);
+                    joueur.incrementerBadge();
+                    std::cout << "\n🎖️ Vous avez obtenu le badge : " << gym_leader->getMedaille() << " !" << std::endl;
+                    std::cout << "🌟 Badges obtenus : " << joueur.getNombreBadges() << "/4" << std::endl;
+                    std::cout << "💪 Félicitations ! Première victoire contre ce leader !" << std::endl;
+                } else {
+                    std::cout << "\n✅ Victoire contre " << gym_leader->getNom() << " (déjà battu)" << std::endl;
+                    std::cout << "📈 Expérience acquise, mais badge déjà obtenu." << std::endl;
+                }
+            } else {
+                Sauvegarde::sauvegarderLeaderBattu(joueur, leaders[choix - 1]);
+            }
+            
             std::cout << "Félicitations ! N'oubliez pas que vous pouvez sauvegarder votre partie via le menu principal." << std::endl;
             waitForEnter();
         }
@@ -150,10 +214,9 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
         std::cout << "3. Gestion de l'entraineur" << std::endl;
         std::cout << "4. Voir les statistiques" << std::endl;
         std::cout << "5. Combattre un leader" << std::endl;
-        std::cout << "6. Interagir avec un Pokémon" << std::endl;
+        std::cout << "6. Menu d'interaction" << std::endl;
         std::cout << "7. Affronter un Maître Pokémon" << std::endl;
-        std::cout << "8. Afficher les leaders battus" << std::endl;
-        std::cout << "9. 💾 Sauvegarder la partie" << std::endl;
+        std::cout << "8. 💾 Sauvegarder la partie" << std::endl;
         std::cout << std::endl << "Votre choix : ";
         int choix;
         std::cin >> choix;
@@ -197,36 +260,92 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                 menuChoixLeader(*joueur, leaders);
                 break;
             case 6: {
-                clearScreen();
-                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-                std::cout << "|     INTERACTION AVEC UN POKÉMON      |" << std::endl;
-                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-                Pokemon* actif = joueur->pokemonActif();
-                if (actif) {
-                    std::cout << actif->interaction() << std::endl;
-                } else {
-                    std::cout << "Aucun Pokémon actif pour interagir." << std::endl;
-                }
-                waitForEnter();
+                menuInteraction(*joueur, leaders, maitres);
                 break;
             }
             case 7: {
                 clearScreen();
-                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-                std::cout << "|     MAÎTRE POKÉMON EN APPROCHE       |" << std::endl;
-                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                std::cout << "|        MAÎTRE POKÉMON EN APPROCHE              |" << std::endl;
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
                 if (joueur->getNombreBadges() < 4) {
                     std::cout << "⛔ Vous devez posséder les 4 badges pour affronter un Maître Pokémon !" << std::endl;
+                    std::cout << "🏅 Badges actuels : " << joueur->getNombreBadges() << "/4" << std::endl;
                     waitForEnter();
                     break;
                 }
+                
                 if (!maitres.empty()) {
-                    srand(static_cast<unsigned int>(time(0)));
-                    int index = rand() % maitres.size();
-                    Entraineur* maitre = maitres[index];
-                    std::cout << "⚔️  Le Maître " << maitre->getNom() << " entre en scène !" << std::endl;
+                    // Afficher les maîtres disponibles et déjà battus
+                    std::vector<std::string> nomsMaitresBattus = Sauvegarde::extraireNomsMaitresBattus();
+                    
+                    std::cout << "Maîtres Pokémon disponibles :" << std::endl;
+                    std::cout << std::string(40, '-') << std::endl;
+                    
+                    for (size_t i = 0; i < maitres.size(); ++i) {
+                        std::cout << (i + 1) << ". Maître " << maitres[i]->getNom();
+                        
+                        // Vérifier si déjà battu
+                        bool dejaBattu = false;
+                        for (const auto& nomBattu : nomsMaitresBattus) {
+                            if (nomBattu == maitres[i]->getNom()) {
+                                dejaBattu = true;
+                                break;
+                            }
+                        }
+                        
+                        if (dejaBattu) {
+                            std::cout << " ✅ [DÉJÀ BATTU]";
+                        } else {
+                            std::cout << " ⭐ [NOUVEAU DÉFI]";
+                        }
+                        std::cout << std::endl;
+                    }
+                    
+                    std::cout << std::string(40, '-') << std::endl;
+                    std::cout << "Choisissez un maître (1-" << maitres.size() << ", 0 pour aléatoire) : ";
+                    int choixMaitre;
+                    std::cin >> choixMaitre;
+                    
+                    Entraineur* maitre = nullptr;
+                    if (choixMaitre == 0) {
+                        // Sélection aléatoire
+                        srand(static_cast<unsigned int>(time(0)));
+                        int index = rand() % maitres.size();
+                        maitre = maitres[index];
+                        std::cout << "🎲 Sélection aléatoire : Maître " << maitre->getNom() << " !" << std::endl;
+                    } else if (choixMaitre > 0 && choixMaitre <= static_cast<int>(maitres.size())) {
+                        maitre = maitres[choixMaitre - 1];
+                        std::cout << "⚔️ Vous avez choisi : Maître " << maitre->getNom() << " !" << std::endl;
+                    } else {
+                        std::cout << "Choix invalide." << std::endl;
+                        waitForEnter();
+                        break;
+                    }
+                    
                     std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+                    
+                    // Vérifier si déjà battu avant le combat
+                    bool dejaBattuAvant = false;
+                    for (const auto& nomBattu : nomsMaitresBattus) {
+                        if (nomBattu == maitre->getNom()) {
+                            dejaBattuAvant = true;
+                            break;
+                        }
+                    }
+                    
+                    if (dejaBattuAvant) {
+                        std::cout << "⚠️ Vous avez déjà battu ce maître auparavant." << std::endl;
+                        std::cout << "Combat pour l'expérience..." << std::endl;
+                    }
+                    
+                    int victoires_avant = joueur->getVictoires();
                     menuCombat(*joueur, *maitre);
+                    
+                    // Sauvegarder uniquement si c'est la première victoire
+                    if (joueur->getVictoires() > victoires_avant && !dejaBattuAvant) {
+                        Sauvegarde::sauvegarderMaitreBattu(*joueur, maitre);
+                    }
                 } else {
                     std::cout << "Aucun Maître Pokémon disponible." << std::endl;
                 }
@@ -234,9 +353,6 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                 break;
             }
             case 8:
-                afficherLeadersBattus();
-                break;
-            case 9:
                 clearScreen();
                 std::cout << "+" << std::string(38, '=') << "+" << std::endl;
                 std::cout << "|         SAUVEGARDE PARTIE            |" << std::endl;
@@ -250,6 +366,224 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                 std::cout << "Choix non valide, veuillez reessayer." << std::endl;
                 waitForEnter();
             }
+    }
+}
+void menuInteraction(Joueur& joueur, std::vector<Entraineur*>& leaders, std::vector<Entraineur*>& maitres) {
+    bool retourMenu = false;
+    
+    while (!retourMenu) {
+        clearScreen();
+        std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+        std::cout << "|             MENU D'INTERACTION                   |" << std::endl;
+        std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+        std::cout << "Avec qui voulez-vous interagir ?" << std::endl;
+        std::cout << "1. 🐾 Avec un de vos Pokémon" << std::endl;
+        std::cout << "2. 🏆 Avec un leader de gym vaincu" << std::endl;
+        std::cout << "3. 🌟 Avec un maître Pokémon vaincu" << std::endl;
+        std::cout << "4. 📜 Voir la liste des leaders battus" << std::endl;
+        std::cout << "5. 📜 Voir la liste des maîtres battus" << std::endl;
+        std::cout << "0. ◀️ Retour au menu principal" << std::endl;
+        std::cout << "\nVotre choix : ";
+        
+        int choix;
+        std::cin >> choix;
+        
+        switch (choix) {
+            case 0: {
+                retourMenu = true;
+                break;
+            }
+            
+            case 1: { // Interaction avec un Pokémon
+                clearScreen();
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                std::cout << "|         INTERACTION AVEC VOS POKÉMON               |" << std::endl;
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                
+                if (joueur.getTailleEquipe() == 0) {
+                    std::cout << "Vous n'avez aucun Pokémon dans votre équipe." << std::endl;
+                    waitForEnter();
+                    break;
+                }
+                
+                std::cout << "Choisissez un Pokémon avec lequel interagir :" << std::endl;
+                std::cout << std::string(40, '-') << std::endl;
+                
+                // Afficher la liste des Pokémon
+                for (int i = 0; i < joueur.getTailleEquipe(); ++i) {
+                    Pokemon* pokemon = joueur.pokemonActif(i);
+                    if (pokemon) {
+                        std::cout << (i + 1) << ". " << pokemon->getNom() << " ["
+                                  << pokemon->getType1();
+                        if (!pokemon->getType2().empty()) {
+                            std::cout << "/" << pokemon->getType2();
+                        }
+                        std::cout << "] ";
+                        if (pokemon->estKo()) {
+                            std::cout << "(K.O.)";
+                        } else {
+                            std::cout << "(" << pokemon->getHp() << "/" << pokemon->getMaxHp() << " HP)";
+                        }
+                        std::cout << std::endl;
+                    }
+                }
+                
+                std::cout << "\nChoisissez un Pokémon (1-" << joueur.getTailleEquipe() 
+                          << ", 0 pour retour) : ";
+                int choixPokemon;
+                std::cin >> choixPokemon;
+                
+                if (choixPokemon > 0 && choixPokemon <= joueur.getTailleEquipe()) {
+                    Pokemon* pokemon = joueur.pokemonActif(choixPokemon - 1);
+                    if (pokemon) {
+                        std::cout << "\n" << std::string(40, '=') << std::endl;
+                        std::cout << "🗣️ " << pokemon->interaction() << std::endl;
+                        std::cout << std::string(40, '=') << std::endl;
+                    }
+                }
+                waitForEnter();
+                break;
+            }
+            
+            case 2: { // Interaction avec un leader de gym vaincu depuis fichier
+                clearScreen();
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                std::cout << "|      INTERACTION AVEC LEADERS VAINCUS              |" << std::endl;
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                
+                // Obtenir les noms des leaders battus depuis le fichier
+                std::vector<std::string> nomsLeadersBattus = Sauvegarde::extraireNomsLeadersBattus();
+                
+                if (nomsLeadersBattus.empty()) {
+                    std::cout << "Vous n'avez vaincu aucun leader de gym." << std::endl;
+                    waitForEnter();
+                    break;
+                }
+                
+                // Trouver les leaders correspondants dans la liste
+                std::vector<LeaderGym*> leadersVaincus;
+                for (const std::string& nomBattu : nomsLeadersBattus) {
+                    for (Entraineur* entraineur : leaders) {
+                        LeaderGym* leader = dynamic_cast<LeaderGym*>(entraineur);
+                        if (leader && leader->getNom() == nomBattu) {
+                            leadersVaincus.push_back(leader);
+                            break;
+                        }
+                    }
+                }
+                
+                std::cout << "Leaders de gym vaincus :" << std::endl;
+                std::cout << std::string(40, '-') << std::endl;
+                
+                for (size_t i = 0; i < leadersVaincus.size(); ++i) {
+                    std::cout << (i + 1) << ". " << leadersVaincus[i]->getNom()
+                              << " (Arène de " << leadersVaincus[i]->getNomGym() << ")" << std::endl;
+                }
+                
+                std::cout << "\nChoisissez un leader (1-" << leadersVaincus.size() 
+                          << ", 0 pour retour) : ";
+                int choixLeader;
+                std::cin >> choixLeader;
+                
+                if (choixLeader > 0 && choixLeader <= static_cast<int>(leadersVaincus.size())) {
+                    LeaderGym* leader = leadersVaincus[choixLeader - 1];
+                    std::cout << "\n" << std::string(40, '=') << std::endl;
+                    std::cout << "🗣️ " << leader->interaction() << std::endl;
+                    std::cout << std::string(40, '=') << std::endl;
+                }
+                waitForEnter();
+                break;
+            }
+            
+            case 3: { // Interaction avec un maître Pokémon vaincu depuis fichier
+                clearScreen();
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                std::cout << "|       INTERACTION AVEC MAÎTRES VAINCUS             |" << std::endl;
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                
+                // Obtenir les noms des maîtres battus depuis le fichier
+                std::vector<std::string> nomsMaitresBattus = Sauvegarde::extraireNomsMaitresBattus();
+                
+                if (nomsMaitresBattus.empty()) {
+                    std::cout << "Vous n'avez vaincu aucun maître Pokémon." << std::endl;
+                    waitForEnter();
+                    break;
+                }
+                
+                // Trouver les maîtres correspondants dans la liste
+                std::vector<MaitrePokemon*> maitresVaincus;
+                for (const std::string& nomBattu : nomsMaitresBattus) {
+                    for (Entraineur* entraineur : maitres) {
+                        MaitrePokemon* maitre = dynamic_cast<MaitrePokemon*>(entraineur);
+                        if (maitre && maitre->getNom() == nomBattu) {
+                            maitresVaincus.push_back(maitre);
+                            break;
+                        }
+                    }
+                }
+                
+                std::cout << "Maîtres Pokémon vaincus :" << std::endl;
+                std::cout << std::string(40, '-') << std::endl;
+                
+                for (size_t i = 0; i < maitresVaincus.size(); ++i) {
+                    std::cout << (i + 1) << ". Maître " << maitresVaincus[i]->getNom() << std::endl;
+                }
+                
+                std::cout << "\nChoisissez un maître (1-" << maitresVaincus.size() 
+                          << ", 0 pour retour) : ";
+                int choixMaitre;
+                std::cin >> choixMaitre;
+                
+                if (choixMaitre > 0 && choixMaitre <= static_cast<int>(maitresVaincus.size())) {
+                    MaitrePokemon* maitre = maitresVaincus[choixMaitre - 1];
+                    std::cout << "\n" << std::string(40, '=') << std::endl;
+                    std::cout << "🗣️ " << maitre->interaction() << std::endl;
+                    std::cout << std::string(40, '=') << std::endl;
+                }
+                waitForEnter();
+                break;
+            }
+            
+            case 4: { // Afficher la liste des leaders battus
+                clearScreen();
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                std::cout << "|            LEADERS DE GYM BATTUS                  |" << std::endl;
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                std::vector<std::string> leaders_battus = Sauvegarde::chargerLeadersBattus();
+                if (leaders_battus.empty()) {
+                    std::cout << "Aucun leader battu ou fichier introuvable." << std::endl;
+                } else {
+                    for (const auto& ligne : leaders_battus) {
+                        std::cout << ligne << std::endl;
+                    }
+                }
+                waitForEnter();
+                break;
+            }
+            
+            case 5: { // Afficher la liste des maîtres battus
+                clearScreen();
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                std::cout << "|            MAÎTRES POKÉMON BATTUS                  |" << std::endl;
+                std::cout << "+" << std::string(50, '=') << "+" << std::endl;
+                std::vector<std::string> maitres_battus = Sauvegarde::chargerMaitresBattus();
+                if (maitres_battus.empty()) {
+                    std::cout << "Aucun maître battu ou fichier introuvable." << std::endl;
+                } else {
+                    for (const auto& ligne : maitres_battus) {
+                        std::cout << ligne << std::endl;
+                    }
+                }
+                waitForEnter();
+                break;
+            }
+            
+            default: {
+                std::cout << "Choix invalide. Veuillez réessayer." << std::endl;
+                waitForEnter();
+                break;
+            }
+        }
     }
 }
 void menuCombat(Joueur& joueur, Entraineur& adversaire) {

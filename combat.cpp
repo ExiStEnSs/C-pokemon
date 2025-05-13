@@ -171,13 +171,18 @@ void demarrerCombat(Entraineur& joueur, Entraineur& adversaire) {
         if (j) {
             j->enregistrerVictoire();
             j->enregistrerVaincu(&adversaire);
+            
+            // Vérifier le type d'adversaire et sauvegarder approprié
             MaitrePokemon* maitre = dynamic_cast<MaitrePokemon*>(&adversaire);
+            LeaderGym* leader = dynamic_cast<LeaderGym*>(&adversaire);
+            
             if (maitre) {
+                Sauvegarde::sauvegarderMaitreBattu(*j, &adversaire);
                 std::cout << "Victoire contre un Maître Pokémon ! N'oubliez pas de sauvegarder votre partie via le menu principal." << std::endl;
                 pauseCourt(1500);
+            } else if (leader) {
+                Sauvegarde::sauvegarderLeaderBattu(*j, &adversaire);
             }
         }
     }
-    std::cout << "==============================\n";
-    pauseCourt(1500);
 }

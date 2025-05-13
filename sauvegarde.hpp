@@ -10,23 +10,23 @@
 class Sauvegarde {
 private:
     static const std::string FICHIER_LEADERS_BATTUS;
+    static const std::string FICHIER_MAITRES_BATTUS;
 
 public:
-    // 🔧 Déplacer FICHIER_JOUEUR vers public pour pouvoir y accéder
     static const std::string FICHIER_JOUEUR;
-    
-    // Sauvegarde des leaders battus
     static void sauvegarderLeaderBattu(const Joueur& joueur, Entraineur* leader);
     static std::vector<std::string> chargerLeadersBattus();
-    
-    // Sauvegarde complète du joueur (équipe + stats dans joueur.csv)
+    static void sauvegarderMaitreBattu(const Joueur& joueur, Entraineur* maitre);
+    static std::vector<std::string> chargerMaitresBattus();
+    static std::vector<std::string> extraireNomsLeadersBattus();
+    static std::vector<std::string> extraireNomsMaitresBattus();
     static void sauvegarderJoueur(const Joueur& joueur);
     static bool chargerJoueur(Joueur& joueur, const std::vector<Pokemon*>& cataloguePokemon, int index = 0);
-    
-    // Utilitaires
     static void sauvegarderPartie(const Joueur& joueur, Entraineur* dernier_leader_battu = nullptr);
     static bool chargerPartie(Joueur& joueur, const std::vector<Pokemon*>& cataloguePokemon);
     static void reinitialisationNouvellePartie();
+    static void nettoyerDoublonsLeaders();
+    static void nettoyerDoublonsMaitres();
 };
 
 #endif

@@ -1,4 +1,3 @@
-// interface.cpp - Version sans codes ANSI
 #include "interface.hpp"
 #include "sauvegarde.hpp"
 #include <iostream>
@@ -140,11 +139,7 @@ void showBattleScreen(const Pokemon* playerPokemon, const Pokemon* enemyPokemon)
     
     // Afficher les options du combat
     std::cout << "\n" << std::string(50, '=') << std::endl;
-    std::cout << "Que voulez-vous faire ?" << std::endl;
-    std::cout << "1. " << playerPokemon->getAttaque() << std::endl;
-    std::cout << "2. Changer de Pokemon" << std::endl;
-    std::cout << "3. Utiliser un objet" << std::endl;
-    std::cout << "4. Fuir" << std::endl;
+    std::cout << "Combat en cours..." << std::endl;
 }
 
 // Animation d'attaque
@@ -158,8 +153,6 @@ void showAttackAnimation(const std::string& attackName, int damage, bool isSuper
     std::cout << "-" << damage << " PV !" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
-
-// Cette fonction a été déplacée dans la classe Sauvegarde
 
 void afficherLeadersBattus() {
     clearScreen();
@@ -216,8 +209,14 @@ void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders) {
         // Vérifier si le joueur a gagné
         if (joueur.getVictoires() > victoires_avant) {
             Sauvegarde::sauvegarderLeaderBattu(joueur, leaders[choix - 1]);
-            
-            // Rappeler au joueur qu'il peut sauvegarder
+
+            // 🎖️ Donne un badge si le leader est bien un LeaderGym
+            LeaderGym* gym_leader = dynamic_cast<LeaderGym*>(leaders[choix - 1]);
+            if (gym_leader) {
+                joueur.incrementerBadge();
+                std::cout << "🎖️ Vous avez obtenu le badge : " << gym_leader->getMedaille() << " !" << std::endl;
+            }
+
             std::cout << "Félicitations ! N'oubliez pas que vous pouvez sauvegarder votre partie via le menu principal." << std::endl;
             waitForEnter();
         }
@@ -272,7 +271,7 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
         std::cout << R"(
         
 ███╗░░░███╗███████╗███╗░░██╗██╗░░░██╗  ██████╗░██████╗░██╗███╗░░██╗░█████╗░██╗██████╗░░█████╗░██╗░░░░░
-████╗░████║██╔════╝████╗░██║██║░░░██║  ██╔══██╗██╔══██╗██║████╗░██║██╔══██╗██║██╔══██╗██╔══██╗██║░░░░░
+████╗░████║██╔════╝████╗░██║██║░░░██║  ██████╗░██╔══██╗██║████╗░██║██╔══██╗██║██╔══██╗██╔══██║██║░░░░░
 ██╔████╔██║█████╗░░██╔██╗██║██║░░░██║  ██████╔╝██████╔╝██║██╔██╗██║██║░░╚═╝██║██████╔╝███████║██║░░░░░
 ██║╚██╔╝██║██╔══╝░░██║╚████║██║░░░██║  ██╔═══╝░██╔══██╗██║██║╚████║██║░░██╗██║██╔═══╝░██╔══██║██║░░░░░
 ██║░╚═╝░██║███████╗██║░╚███║╚██████╔╝  ██║░░░░░██║░░██║██║██║░╚███║╚█████╔╝██║██║░░░░░██║░░██║███████╗
@@ -385,7 +384,16 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                 afficherLeadersBattus();
                 break;
             case 9:
-                menuSauvegardeChargement(*joueur, cataloguePokemon, leaders, maitres);
+                // Sauvegarde directe
+                clearScreen();
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                std::cout << "|         SAUVEGARDE PARTIE            |" << std::endl;
+                std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+                
+                std::cout << "Sauvegarde en cours..." << std::endl;
+                Sauvegarde::sauvegarderPartie(*joueur);
+                std::cout << "✅ Partie sauvegardée avec succès !" << std::endl;
+                waitForEnter();
                 break;
             default:
                 std::cout << "Choix non valide, veuillez reessayer." << std::endl;
@@ -394,7 +402,6 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
     }
 }
 
-// Menu de combat amélioré
 void menuCombat(Joueur& joueur, Entraineur& adversaire) {
     clearScreen();
     std::cout << "+" << std::string(38, '=') << "+" << std::endl;
@@ -411,43 +418,15 @@ void menuCombat(Joueur& joueur, Entraineur& adversaire) {
     std::cout << "\nVous envoyez : " << joueur.pokemonActif()->getNom() << " !" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    std::cout << "\nLe combat commence..." << std::endl;
+    std::cout << "\nLe combat commence ..." << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    // Lancement réel du combat
     demarrerCombat(joueur, adversaire);
 
     std::cout << "\nRetour au menu principal..." << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 }
 
-void choisirPokemonActif(Joueur& joueur) {
-    while (true) {
-        clearScreen();
-        std::cout << "=== Choisissez un Pokémon ===\n\n";
-        joueur.afficherEquipe();
-
-        std::cout << "\nNuméro du Pokémon à envoyer au combat : ";
-        int choix;
-        std::cin >> choix;
-
-        if (choix >= 1 && choix <= 6) {
-            Pokemon* selection = joueur.pokemonActif();
-            joueur.selectionnerPokemon(choix - 1);
-            if (!joueur.pokemonActif()->estKo()) {
-                std::cout << "\nVous avez choisi : " << joueur.pokemonActif()->getNom() << "\n";
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                break;
-            } else {
-                std::cout << "Ce Pokémon est K.O. ! Choisissez-en un autre.\n";
-                std::this_thread::sleep_for(std::chrono::milliseconds(1200));
-            }
-        } else {
-            std::cout << "Entrée invalide. Essayez encore.\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        }
-    }
-}
 void menuGestionEntraineur(Joueur*& joueur, std::vector<Pokemon*>& cataloguePokemon) {
     bool retourMenu = false;
     

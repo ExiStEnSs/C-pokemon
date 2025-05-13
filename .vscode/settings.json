@@ -59,5 +59,6 @@
         "variant": "cpp",
         "cstdarg": "cpp",
         "map": "cpp"
-    }
+    },
+    "git.ignoreLimitWarning": true
 }

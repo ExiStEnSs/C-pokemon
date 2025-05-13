@@ -8,8 +8,6 @@
 #include <chrono>
 #include <windows.h>
 
-void choisirPokemonActif(Joueur& joueur);
-
 void pauseCourt(int ms = 900) {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
@@ -68,7 +66,7 @@ void afficherAttaque(const Pokemon* attaquant) {
 // Variable globale pour compter les attaques
 int compteurAttaques = 0;
 
-void infligerDegats(Pokemon* cible, Pokemon* attaquant) {
+void infligerDegats(Pokemon* cible, Pokemon* attaquant, Entraineur* attaquantOwner) {
     // Obtenir les types pour le débogage
     std::string typeAttaquant = attaquant->getType1();
     std::string typeDefenseur = cible->getType1();
@@ -114,8 +112,17 @@ void infligerDegats(Pokemon* cible, Pokemon* attaquant) {
     
     std::cout << "DEBUG: Multiplicateur final = " << coeff << std::endl;
     
-    // Calculer les dégâts finaux
+    // Calculer les dégâts avec le multiplicateur de type
     int degats = static_cast<int>(attaquant->getPuissance() * coeff);
+    
+    // 🌟 NOUVEAUTÉ : Vérifier si l'attaquant appartient à un Maître Pokémon
+    MaitrePokemon* maitre = dynamic_cast<MaitrePokemon*>(attaquantOwner);
+    if (maitre) {
+        int degatsAvantBonus = degats;
+        degats = maitre->appliquerBonusDegats(degats);
+        std::cout << "🌟 BONUS MAÎTRE POKÉMON APPLIQUÉ ! (" 
+                  << degatsAvantBonus << " → " << degats << " dégâts)" << std::endl;
+    }
     
     // Infliger les dégâts
     cible->subirDegats(degats);
@@ -147,6 +154,21 @@ void infligerDegats(Pokemon* cible, Pokemon* attaquant) {
     pauseCourt();
 }
 
+// Fonction automatique pour sélectionner le prochain Pokémon
+void selectionnerPokemonAutomatique(Entraineur& entraineur) {
+    if (!entraineur.touteEquipeKO()) {
+        for (int i = 0; i < 6; ++i) {
+            Pokemon* pokemon = entraineur.pokemonActif(i);
+            if (pokemon && !pokemon->estKo()) {
+                entraineur.selectionnerPokemon(i);
+                std::cout << entraineur.getNom() << " envoie " << pokemon->getNom() << " !" << std::endl;
+                pauseCourt();
+                return;
+            }
+        }
+    }
+}
+
 bool verifierKO(Pokemon* cible, Pokemon* attaquant, Entraineur& possesseur) {
     if (cible->estKo()) {
         afficherBoite(cible->getNom() + " est K.O. !");
@@ -154,67 +176,18 @@ bool verifierKO(Pokemon* cible, Pokemon* attaquant, Entraineur& possesseur) {
         pauseCourt();
 
         if (!possesseur.touteEquipeKO()) {
-            Joueur* joueur = dynamic_cast<Joueur*>(&possesseur);
-            if (joueur) {
-                choisirPokemonActif(*joueur);
-            } else {
-                for (int i = 0; i < 6; ++i) {
-                    possesseur.selectionnerPokemon(i);
-                    if (!possesseur.pokemonActif()->estKo()) break;
-                }
-            }
+            // Sélection automatique du prochain Pokémon
+            selectionnerPokemonAutomatique(possesseur);
         }
         return true;
     }
     return false;
 }
 
-bool tourDuJoueur(Joueur& joueur, Entraineur& adversaire) {
-    while (true) {
-        Pokemon* attaquant = joueur.pokemonActif();
-        Pokemon* cible = adversaire.pokemonActif();
-
-        std::cout << "\nQue voulez-vous faire ?\n";
-        std::cout << "1. Attaquer\n";
-        std::cout << "2. Changer de Pokémon\n";
-        std::cout << "3. Utiliser un objet (indisponible)\n";
-        std::cout << "4. Fuir\n";
-        std::cout << "Votre choix : ";
-        int choix;
-        std::cin >> choix;
-
-        switch (choix) {
-            case 1:
-                afficherAttaque(attaquant);
-                infligerDegats(cible, attaquant);
-                verifierKO(cible, attaquant, adversaire);
-                return false;
-
-            case 2:
-                choisirPokemonActif(joueur);
-                return false;
-
-            case 3:
-                std::cout << "🚫 Les objets ne sont pas utilisables pour le moment.\n";
-                pauseCourt();
-                break;
-
-            case 4:
-                std::cout << "Vous prenez la fuite...\n";
-                pauseCourt();
-                return true;
-
-            default:
-                std::cout << "Choix invalide.\n";
-                pauseCourt();
-        }
-    }
-}
-
-void tourDeCombat(Pokemon* attaquant, Pokemon* cible, Entraineur& cibleOwner) {
+void tourDeCombat(Pokemon* attaquant, Pokemon* cible, Entraineur& cibleOwner, Entraineur& attaquantOwner) {
     if (!attaquant || !cible || attaquant->estKo() || cible->estKo()) return;
     afficherAttaque(attaquant);
-    infligerDegats(cible, attaquant);
+    infligerDegats(cible, attaquant, &attaquantOwner); // ✅ Passer le propriétaire de l'attaquant
     verifierKO(cible, attaquant, cibleOwner);
 }
 
@@ -224,20 +197,20 @@ void demarrerCombat(Entraineur& joueur, Entraineur& adversaire) {
     
     afficherBoite("⚔️  COMBAT POKEMON !");
 
-    if (Joueur* j = dynamic_cast<Joueur*>(&joueur)) {
-        choisirPokemonActif(*j);
-    }
-    afficherEntreeCombat(adversaire.pokemonActif(), "🔴 Adversaire");
+    // Afficher les Pokémon qui entrent au combat
+    std::cout << "\n=== Début du combat ===" << std::endl;
+    afficherEntreeCombat(joueur.pokemonActif(), "🔵 " + joueur.getNom());
+    afficherEntreeCombat(adversaire.pokemonActif(), "🔴 " + adversaire.getNom());
 
+    // Combat automatique : alternance de tours
     while (!joueur.touteEquipeKO() && !adversaire.touteEquipeKO()) {
-        if (tourDuJoueur(dynamic_cast<Joueur&>(joueur), adversaire)) {
-            afficherBoite("❌ Vous avez fui le combat.");
-            return;
-        }
-
+        std::cout << "\n--- Tour du joueur ---" << std::endl;
+        tourDeCombat(joueur.pokemonActif(), adversaire.pokemonActif(), adversaire, joueur); // ✅ Passer les deux entraîneurs
+        
         if (adversaire.touteEquipeKO()) break;
-
-        tourDeCombat(adversaire.pokemonActif(), joueur.pokemonActif(), joueur);
+        
+        std::cout << "\n--- Tour de l'adversaire ---" << std::endl;
+        tourDeCombat(adversaire.pokemonActif(), joueur.pokemonActif(), joueur, adversaire); // ✅ Passer les deux entraîneurs
     }
 
     std::cout << "\n==============================\n";

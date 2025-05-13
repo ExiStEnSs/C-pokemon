@@ -3,6 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
+                //"C:\\Users\\HP\\Desktop\\C-pokemon"
                 "C:\\Users\\chris\\Desktop\\cours\\A3\\C++\\C-pokemon"
             ],
             "defines": [

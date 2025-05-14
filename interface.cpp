@@ -21,12 +21,7 @@ void waitForEnter() {
     std::cin.ignore(10000, '\n');
     std::cin.get();
 }
-void showDialogBox(const std::string& text) {
-    int width = 60;
-    std::cout << "+" << std::string(width - 2, '-') << "+" << std::endl;
-    std::cout << "| " << text << std::string(width - text.length() - 4, ' ') << " |" << std::endl;
-    std::cout << "+" << std::string(width - 2, '-') << "+" << std::endl;
-}
+
 void showPokemonList(const Entraineur* entraineur) {
     entraineur->afficherEquipe();
 }

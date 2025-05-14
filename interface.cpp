@@ -291,7 +291,6 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                 }
                 
                 if (!maitres.empty()) {
-                    // Afficher les maîtres disponibles et déjà battus
                     std::vector<std::string> nomsMaitresBattus = Sauvegarde::extraireNomsMaitresBattus();
                     
                     std::cout << "Maîtres Pokémon disponibles :" << std::endl;
@@ -300,20 +299,7 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                     for (size_t i = 0; i < maitres.size(); ++i) {
                         std::cout << (i + 1) << ". Maître " << maitres[i]->getNom();
                         
-                        // Vérifier si déjà battu
-                        bool dejaBattu = false;
-                        for (const auto& nomBattu : nomsMaitresBattus) {
-                            if (nomBattu == maitres[i]->getNom()) {
-                                dejaBattu = true;
-                                break;
-                            }
-                        }
                         
-                        if (dejaBattu) {
-                            std::cout << " ✅ [DÉJÀ BATTU]";
-                        } else {
-                            std::cout << " ⭐ [NOUVEAU DÉFI]";
-                        }
                         std::cout << std::endl;
                     }
                     
@@ -706,9 +692,14 @@ void menuInteraction(Joueur& joueur, std::vector<Entraineur*>& leaders, std::vec
 }
 void menuCombat(Joueur& joueur, Entraineur& adversaire) {
     clearScreen();
-    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
-    std::cout << "|              COMBAT !                |" << std::endl;
-    std::cout << "+" << std::string(38, '=') << "+" << std::endl;
+    std::cout << R"(
+░█████╗░░█████╗░███╗░░░███╗██████╗░░█████╗░████████╗
+██╔══██╗██╔══██╗████╗░████║██╔══██╗██╔══██╗╚══██╔══╝
+██║░░╚═╝██║░░██║██╔████╔██║██████╦╝███████║░░░██║░░░
+██║░░██╗██║░░██║██║╚██╔╝██║██╔══██╗██╔══██║░░░██║░░░
+╚█████╔╝╚█████╔╝██║░╚═╝░██║██████╦╝██║░░██║░░░██║░░░
+░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░
+    )" << std::endl;
     std::cout << "Un adversaire approche..." << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     std::cout << "\n" << adversaire.getNom() << " envoie " << adversaire.pokemonActif()->getNom()<< " ! Préparez-vous !" << std::endl;

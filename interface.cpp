@@ -12,7 +12,6 @@
 void clearScreen() {
     std::cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << std::endl;
 }
-
 void typingEffect(const std::string& text, int delayMs) {
     std::cout << text << std::endl;
 }
@@ -21,7 +20,6 @@ void waitForEnter() {
     std::cin.ignore(10000, '\n');
     std::cin.get();
 }
-
 void showPokemonList(const Entraineur* entraineur) {
     entraineur->afficherEquipe();
 }

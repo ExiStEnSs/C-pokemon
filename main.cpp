@@ -52,7 +52,6 @@ vector<Pokemon*> importerPokemonDepuisCSV(const string& cheminFichier) {
     }
     return catalogue;
 }
-
 // Fonction pour lister tous les joueurs disponibles
 vector<string> listerJoueursDisponibles(const string& chemin) {
     vector<string> noms;
@@ -79,8 +78,7 @@ vector<string> listerJoueursDisponibles(const string& chemin) {
     
     return noms;
 }
-
-// Fonction pour créer un joueur par index (modifiée)
+// Fonction pour créer un joueur par index
 Joueur* creerJoueurDepuisCSV(const string& chemin, const vector<Pokemon*>& reference, int index) {
     ifstream fichier(chemin);
     string ligne;
@@ -222,7 +220,6 @@ Joueur* creerJoueurDepuisCSV(const string& chemin, const vector<Pokemon*>& refer
     }
     return nullptr;
 }
-
 Joueur* choisirJoueur(const string& chemin, const vector<Pokemon*>& reference) {
     clearScreen();
     std::cout << R"(
@@ -289,7 +286,6 @@ Joueur* choisirJoueur(const string& chemin, const vector<Pokemon*>& reference) {
         return creerJoueurDepuisCSV(chemin, reference, 0);
     }
 }
-
 vector<Entraineur*> chargerEntraineursDepuisCSV(const string& chemin, const vector<Pokemon*>& reference, bool estMaitre) {
     vector<Entraineur*> entraineurs;
     ifstream fichier(chemin);
@@ -407,12 +403,10 @@ vector<Entraineur*> chargerEntraineursDepuisCSV(const string& chemin, const vect
     }
     return entraineurs;
 }
-
 void interfaceUtilisateur(Joueur* joueur, vector<Entraineur*> leaders, vector<Entraineur*> maitres, vector<Pokemon*>& cataloguePokemon) {
     showTitleScreen();
     menuPrincipal(joueur, leaders, maitres, cataloguePokemon);
 }
-
 int main() {
     system("chcp 65001 > nul");
 

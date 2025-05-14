@@ -12,7 +12,6 @@ using namespace std;
 const string Sauvegarde::FICHIER_LEADERS_BATTUS = "save/leaders_battus.txt";
 const string Sauvegarde::FICHIER_JOUEUR = "joueur.csv";
 const string Sauvegarde::FICHIER_MAITRES_BATTUS = "save/maitres_battus.txt";
-
 // Créer la fonction pour s'assurer que le dossier existe
 void assurerDossierSauvegarde() {
 #ifdef _WIN32
@@ -21,7 +20,6 @@ void assurerDossierSauvegarde() {
     system("mkdir -p save 2>/dev/null");
 #endif
 }
-
 // Sauvegarde des leaders battus
 void Sauvegarde::sauvegarderLeaderBattu(const Joueur& joueur, Entraineur* leader) {
     if (!leader) {
@@ -319,7 +317,6 @@ void Sauvegarde::nettoyerDoublonsLeaders() {
                   << " doublons supprimés." << endl;
     }
 }
-
 // Fonction pour nettoyer les doublons des maîtres
 void Sauvegarde::nettoyerDoublonsMaitres() {
     vector<string> lignes = chargerMaitresBattus();
@@ -505,7 +502,6 @@ bool Sauvegarde::chargerJoueur(Joueur& joueur, const vector<Pokemon*>& catalogue
     fichier.close();
     return false;
 }
-
 void Sauvegarde::sauvegarderPartie(const Joueur& joueur, Entraineur* dernier_leader_battu) {
     assurerDossierSauvegarde();
     
@@ -521,7 +517,6 @@ void Sauvegarde::sauvegarderPartie(const Joueur& joueur, Entraineur* dernier_lea
         cerr << "Erreur lors de la sauvegarde: " << e.what() << endl;
     }
 }
-
 // Fonction de chargement simplifiée
 bool Sauvegarde::chargerPartie(Joueur& joueur, const vector<Pokemon*>& cataloguePokemon) {
     try {
@@ -532,7 +527,6 @@ bool Sauvegarde::chargerPartie(Joueur& joueur, const vector<Pokemon*>& catalogue
         return false;
     }
 }
-
 // Réinitialiser les fichiers pour une nouvelle partie
 void Sauvegarde::reinitialisationNouvellePartie() {
     assurerDossierSauvegarde();

@@ -93,8 +93,6 @@ void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders) {
         LeaderGym* leader = dynamic_cast<LeaderGym*>(leaders[i]);
         if (leader) {
             std::cout << (i + 1) << ". " << leader->getNom() << " (Arène de " << leader->getNomGym() << ")";
-            
-            // Vérifier si ce leader a déjà été battu
             bool dejaBattu = false;
             for (const auto& nomBattu : nomsLeadersBattus) {
                 if (nomBattu == leader->getNom()) {
@@ -122,8 +120,6 @@ void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders) {
     
     if (choix > 0 && choix <= static_cast<int>(leaders.size())) {
         LeaderGym* gym_leader = dynamic_cast<LeaderGym*>(leaders[choix - 1]);
-        
-        // Vérifier si ce leader a déjà été battu AVANT le combat
         bool dejaBattuAvant = false;
         if (gym_leader) {
             for (const auto& nomBattu : nomsLeadersBattus) {
@@ -146,14 +142,9 @@ void menuChoixLeader(Joueur& joueur, std::vector<Entraineur*>& leaders) {
         
         int victoires_avant = joueur.getVictoires();
         int badges_avant = joueur.getNombreBadges();
-        
-        // Démarrer le combat
         menuCombat(joueur, *leaders[choix - 1]);
-        
-        // Vérifier si le combat a été gagné
         if (joueur.getVictoires() > victoires_avant) {
             if (gym_leader) {
-                // Sauvegarder uniquement si c'est la première victoire
                 if (!dejaBattuAvant) {
                     Sauvegarde::sauvegarderLeaderBattu(joueur, leaders[choix - 1]);
                     joueur.incrementerBadge();
@@ -310,7 +301,6 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                     
                     Entraineur* maitre = nullptr;
                     if (choixMaitre == 0) {
-                        // Sélection aléatoire
                         srand(static_cast<unsigned int>(time(0)));
                         int index = rand() % maitres.size();
                         maitre = maitres[index];
@@ -325,8 +315,6 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                     }
                     
                     std::this_thread::sleep_for(std::chrono::milliseconds(1200));
-                    
-                    // Vérifier si déjà battu avant le combat
                     bool dejaBattuAvant = false;
                     for (const auto& nomBattu : nomsMaitresBattus) {
                         if (nomBattu == maitre->getNom()) {
@@ -342,8 +330,6 @@ void menuPrincipal(Joueur* joueur, std::vector<Entraineur*> leaders, std::vector
                     
                     int victoires_avant = joueur->getVictoires();
                     menuCombat(*joueur, *maitre);
-                    
-                    // Sauvegarder uniquement si c'est la première victoire
                     if (joueur->getVictoires() > victoires_avant && !dejaBattuAvant) {
                         Sauvegarde::sauvegarderMaitreBattu(*joueur, maitre);
                     }
@@ -419,7 +405,7 @@ void menuInteraction(Joueur& joueur, std::vector<Entraineur*>& leaders, std::vec
                 break;
             }
             
-            case 1: { // Interaction avec un Pokémon
+            case 1: {
                 clearScreen();
                 std::cout << R"(
 ██╗███╗░░██╗████████╗███████╗██████╗░░█████╗░░█████╗░████████╗██╗░█████╗░███╗░░██╗
@@ -451,8 +437,6 @@ void menuInteraction(Joueur& joueur, std::vector<Entraineur*>& leaders, std::vec
                 
                 std::cout << "Choisissez un Pokémon avec lequel interagir :" << std::endl;
                 std::cout << std::string(40, '-') << std::endl;
-                
-                // Afficher la liste des Pokémon
                 for (int i = 0; i < joueur.getTailleEquipe(); ++i) {
                     Pokemon* pokemon = joueur.pokemonActif(i);
                     if (pokemon) {
@@ -488,7 +472,7 @@ void menuInteraction(Joueur& joueur, std::vector<Entraineur*>& leaders, std::vec
                 break;
             }
             
-            case 2: { // Interaction avec un leader de gym vaincu depuis fichier
+            case 2: {
                 clearScreen();
                 std::cout << R"(
 ██╗███╗░░██╗████████╗███████╗██████╗░░█████╗░░█████╗░████████╗██╗░█████╗░███╗░░██╗
@@ -624,7 +608,7 @@ void menuInteraction(Joueur& joueur, std::vector<Entraineur*>& leaders, std::vec
     break;
 }
             
-            case 4: { // Afficher la liste des leaders battus
+            case 4: {
                 clearScreen();
                 std::cout << R"(
 ██╗░░░░░███████╗░█████╗░██████╗░███████╗██████╗░  ██████╗░███████╗  ░██████╗░██╗░░░██╗███╗░░░███╗
@@ -653,7 +637,7 @@ void menuInteraction(Joueur& joueur, std::vector<Entraineur*>& leaders, std::vec
                 break;
             }
             
-            case 5: { // Afficher la liste des maîtres battus
+            case 5: {
                 clearScreen();
                 std::cout << R"(
 ███╗░░░███╗░█████╗░██╗████████╗██████╗░███████╗░██████╗  ██████╗░░█████╗░██╗░░██╗███████╗███╗░░░███╗░█████╗░███╗░░██╗

@@ -30,7 +30,6 @@ vector<Pokemon*> importerPokemonDepuisCSV(const string& cheminFichier) {
 
             Pokemon* p = nullptr;
             
-            // Création des objets Pokémon en fonction du type1
             if (type1 == "Feu") p = new Feu(nom, type2, hp, attaque, puissance);
             else if (type1 == "Eau") p = new Eau(nom, type2, hp, attaque, puissance);
             else if (type1 == "Plante") p = new Plante(nom, type2, hp, attaque, puissance);
@@ -107,7 +106,7 @@ Joueur* creerJoueurDepuisCSV(const string& chemin, const vector<Pokemon*>& refer
             for (auto nomPk : nomsPokemon) {
                 // Nettoyage des espaces invisibles
                 nomPk.erase(nomPk.find_last_not_of(" \n\r\t") + 1);
-                if (nomPk.empty()) continue;  // Ignorer les emplacements vides
+                if (nomPk.empty()) continue;
                 
                 for (const auto& p : reference) {
                     string nomBase = p->getNom();
@@ -192,7 +191,7 @@ Joueur* creerJoueurDepuisCSV(const string& chemin, const vector<Pokemon*>& refer
                 }
             }
             
-            // Lire les statistiques (nouvelles colonnes)
+            // Lire les statistiques
             string temp;
             int badges = 0, victoires = 0, defaites = 0;
             
@@ -221,10 +220,9 @@ Joueur* creerJoueurDepuisCSV(const string& chemin, const vector<Pokemon*>& refer
         }
         ++compteur;
     }
-    return nullptr;  // Si l'index n'existe pas
+    return nullptr;
 }
 
-// Fonction pour choisir un joueur au début
 Joueur* choisirJoueur(const string& chemin, const vector<Pokemon*>& reference) {
     clearScreen();
     std::cout << R"(
@@ -322,8 +320,7 @@ vector<Entraineur*> chargerEntraineursDepuisCSV(const string& chemin, const vect
         for (auto nomPk : nomsPokemon) {
             // Nettoyage des espaces invisibles
             nomPk.erase(nomPk.find_last_not_of(" \n\r\t") + 1);
-            if (nomPk.empty()) continue;  // Ignorer les emplacements vides
-            
+            if (nomPk.empty()) continue;  
             for (const auto& p : reference) {
                 string nomBase = p->getNom();
                 nomBase.erase(nomBase.find_last_not_of(" \n\r\t") + 1);
@@ -429,17 +426,14 @@ int main() {
         return -1;
     }
 
-    // 🔍 Vérification importante : l'équipe est-elle déjà chargée ?
     cout << "👤 Joueur sélectionné : " << joueur->getNom() << endl;
     cout << "📊 Équipe actuelle : " << joueur->getTailleEquipe() << " Pokémon" << endl;
 
-    // Si l'équipe est vide, c'est normal, sinon c'est déjà chargé
     if (joueur->getTailleEquipe() > 0) {
         cout << "✅ Équipe déjà chargée depuis le CSV !" << endl;
         cout << "Premier Pokémon : " << joueur->pokemonActif()->getNom() << endl;
     }
 
-    // Gestion de la sauvegarde/chargement
     clearScreen();
     std::cout << R"(
 ░██████╗██╗███╗░░░███╗██╗░░░██╗██╗░░░░░░█████╗░████████╗███████╗██╗░░░██╗██████╗░  ██████╗░███████╗
@@ -465,7 +459,6 @@ int main() {
     cin >> charger;
     
     if (charger == 1) {
-        // IMPORTANT : Ne pas recharger si l'équipe est déjà correcte
         if (joueur->getTailleEquipe() == 0) {
             bool chargementReussi = Sauvegarde::chargerPartie(*joueur, baseDeDonnees);
             
@@ -479,13 +472,11 @@ int main() {
             cout << "✅ Partie chargée avec succès !" << endl;
         }
         
-        // Afficher les statistiques
         joueur->afficherStats();
         waitForEnter();
     } else {
         cout << "🔄 Réinitialisation en cours..." << endl;
     
-    // 1. Sauvegarder l'index du joueur actuel
     string nomJoueurActuel = joueur->getNom();
     vector<string> nomsJoueurs = listerJoueursDisponibles("joueur.csv");
     int indexJoueur = 0;
@@ -497,10 +488,8 @@ int main() {
         }
     }
     
-    // 2. Réinitialiser le fichier
     Sauvegarde::reinitialisationNouvellePartie();
     
-    // 3. Supprimer et recréer le joueur
     delete joueur;
     joueur = creerJoueurDepuisCSV("joueur.csv", baseDeDonnees, indexJoueur);
     

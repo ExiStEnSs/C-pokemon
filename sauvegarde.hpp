@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include <fstream>
-
 class Sauvegarde {
 private:
     static const std::string FICHIER_LEADERS_BATTUS;

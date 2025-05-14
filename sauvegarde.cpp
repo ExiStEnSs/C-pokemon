@@ -44,7 +44,7 @@ void Sauvegarde::sauvegarderLeaderBattu(const Joueur& joueur, Entraineur* leader
         for (const auto& ligne : leadersExistants) {
             if (ligne.find("Leader " + nomLeader + " (Arène de " + nomGym + ")") != string::npos) {
                 cout << "ℹ️  Le leader " << nomLeader << " a déjà été battu. Victoire enregistrée mais pas de nouveau badge." << endl;
-                return; // Ne pas sauvegarder si déjà présent
+                return;
             }
         }
     }
@@ -102,7 +102,7 @@ void Sauvegarde::sauvegarderMaitreBattu(const Joueur& joueur, Entraineur* maitre
         for (const auto& ligne : maitresExistants) {
             if (ligne.find("Maître " + nomMaitre + " battu") != string::npos) {
                 cout << "ℹ️  Le maître " << nomMaitre << " a déjà été battu. Victoire enregistrée mais pas de doublon." << endl;
-                return; // Ne pas sauvegarder si déjà présent
+                return;
             }
         }
     }
@@ -137,7 +137,7 @@ vector<string> Sauvegarde::chargerLeadersBattus() {
     ifstream fichier(FICHIER_LEADERS_BATTUS);
     
     if (!fichier.is_open()) {
-        return leaders; // Retourne un vecteur vide si le fichier n'existe pas
+        return leaders;
     }
     
     string ligne;
@@ -155,7 +155,7 @@ vector<string> Sauvegarde::chargerMaitresBattus() {
     ifstream fichier(FICHIER_MAITRES_BATTUS);
     
     if (!fichier.is_open()) {
-        return maitres; // Retourne un vecteur vide si le fichier n'existe pas
+        return maitres;
     }
     
     string ligne;
@@ -202,7 +202,7 @@ vector<string> Sauvegarde::extraireNomsLeadersBattus() {
         // Format: "Leader NomLeader (Arène de NomGym) battu par NomJoueur le Date"
         size_t pos = ligne.find("Leader ");
         if (pos != string::npos) {
-            pos += 7; // Longueur de "Leader "
+            pos += 7;
             size_t fin = ligne.find(" (Arène", pos);
             if (fin != string::npos) {
                 string nom = ligne.substr(pos, fin - pos);
@@ -221,7 +221,7 @@ vector<string> Sauvegarde::extraireNomsMaitresBattus() {
         // Format: "Maître NomMaitre battu par NomJoueur le Date"
         size_t pos = ligne.find("Maître ");
         if (pos != string::npos) {
-            pos += 7; // Longueur de "Maître "
+            pos += 7;
             size_t fin = ligne.find(" battu", pos);
             if (fin != string::npos) {
                 string nom = ligne.substr(pos, fin - pos);
@@ -263,14 +263,13 @@ void Sauvegarde::sauvegarderJoueur(const Joueur& joueur) {
     // Chercher si le joueur existe déjà
     bool joueurTrouve = false;
     for (size_t i = 0; i < lignes.size(); ++i) {
-        if (i == 0) continue; // Ignorer l'en-tête
+        if (i == 0) continue;
         
         stringstream ss(lignes[i]);
         string nomExistant;
         getline(ss, nomExistant, ',');
         
         if (nomExistant == joueur.getNom()) {
-            // Mettre à jour la ligne existante
             lignes[i] = nouvelleLigne.str();
             joueurTrouve = true;
             break;
@@ -336,7 +335,6 @@ void Sauvegarde::nettoyerDoublonsMaitres() {
             if (fin != string::npos) {
                 string identifiant = ligne.substr(debut, fin - debut);
                 
-                // Si pas encore vu, l'ajouter
                 if (maitresVus.find(identifiant) == maitresVus.end()) {
                     maitresVus.insert(identifiant);
                     lignesUniques.push_back(ligne);
@@ -372,7 +370,6 @@ bool Sauvegarde::chargerJoueur(Joueur& joueur, const vector<Pokemon*>& catalogue
     string ligne;
     int compteur = 0;
     
-    // Ignorer l'en-tête
     if (!getline(fichier, ligne)) {
         fichier.close();
         return false;
@@ -392,7 +389,6 @@ bool Sauvegarde::chargerJoueur(Joueur& joueur, const vector<Pokemon*>& catalogue
         bool ligneCorrecte = false;
         
         if (index == -1) {
-            // Recherche par nom - nettoyer les espaces pour comparaison
             string nomLuClean = nomLu;
             nomLuClean.erase(0, nomLuClean.find_first_not_of(" \t\r\n"));
             nomLuClean.erase(nomLuClean.find_last_not_of(" \t\r\n") + 1);
@@ -406,7 +402,6 @@ bool Sauvegarde::chargerJoueur(Joueur& joueur, const vector<Pokemon*>& catalogue
                 cout << "✅ Joueur trouvé par nom !" << endl;
             }
         } else {
-            // Recherche par index
             if (compteur == index) {
                 ligneCorrecte = true;
                 cout << "✅ Joueur trouvé par index !" << endl;
@@ -414,7 +409,6 @@ bool Sauvegarde::chargerJoueur(Joueur& joueur, const vector<Pokemon*>& catalogue
         }
         
         if (ligneCorrecte) {
-            // Parser la ligne trouvée - recommencer la lecture
             stringstream ss2(ligne);
             string nom;
             vector<string> nomsPokemon(6);
@@ -444,15 +438,11 @@ bool Sauvegarde::chargerJoueur(Joueur& joueur, const vector<Pokemon*>& catalogue
                 cout << "📊 Défaites trouvées : " << defaites << endl;
             }
             
-            // Nettoyer d'abord les statistiques actuelles du joueur
-            // (Puisque nous n'avons pas de méthode reset, nous devons calculer la différence)
             cout << "📊 Stats actuelles avant chargement :" << endl;
             cout << "   Badges : " << joueur.getNombreBadges() << endl;
             cout << "   Victoires : " << joueur.getVictoires() << endl;
             cout << "   Défaites : " << joueur.getDefaites() << endl;
             
-            // Appliquer les statistiques au joueur
-            // Calculer les différences pour incrémenter correctement
             int badgesDiff = badges - joueur.getNombreBadges();
             int victoiresDiff = victoires - joueur.getVictoires();
             int defaitesDiff = defaites - joueur.getDefaites();
@@ -462,7 +452,6 @@ bool Sauvegarde::chargerJoueur(Joueur& joueur, const vector<Pokemon*>& catalogue
             cout << "   Victoires : +" << victoiresDiff << endl;
             cout << "   Défaites : +" << defaitesDiff << endl;
             
-            // Appliquer les incréments si nécessaire
             for (int i = 0; i < badgesDiff && badgesDiff > 0; ++i) {
                 joueur.incrementerBadge();
             }
@@ -499,7 +488,6 @@ bool Sauvegarde::chargerJoueur(Joueur& joueur, const vector<Pokemon*>& catalogue
                 
                 for (const auto& p : cataloguePokemon) {
                     if (p && p->getNom() == nomProprePk) {
-                        // [Votre logique de création existante...]
                         cout << "   ✅ " << nomProprePk << " trouvé et ajouté !" << endl;
                         break;
                     }
@@ -522,10 +510,10 @@ void Sauvegarde::sauvegarderPartie(const Joueur& joueur, Entraineur* dernier_lea
     assurerDossierSauvegarde();
     
     try {
-        // Sauvegarder dans joueur.csv (équipe + stats)
+        // Sauvegarder dans joueur.csv
         sauvegarderJoueur(joueur);
         
-        // Sauvegarder le leader battu (si fourni)
+        // Sauvegarder le leader battu
         if (dernier_leader_battu) {
             sauvegarderLeaderBattu(joueur, dernier_leader_battu);
         }
@@ -537,7 +525,7 @@ void Sauvegarde::sauvegarderPartie(const Joueur& joueur, Entraineur* dernier_lea
 // Fonction de chargement simplifiée
 bool Sauvegarde::chargerPartie(Joueur& joueur, const vector<Pokemon*>& cataloguePokemon) {
     try {
-        // Charger depuis joueur.csv (recherche par nom)
+        // Charger depuis joueur.csv
         return chargerJoueur(joueur, cataloguePokemon, -1);
     } catch (const exception& e) {
         cerr << "Erreur lors du chargement: " << e.what() << endl;
@@ -550,7 +538,6 @@ void Sauvegarde::reinitialisationNouvellePartie() {
     assurerDossierSauvegarde();
     
     try {
-        // 1. Réinitialiser le fichier des leaders battus
         ofstream fichierLeaders(FICHIER_LEADERS_BATTUS, ios::trunc);
         if (fichierLeaders.is_open()) {
             fichierLeaders.close();
@@ -559,13 +546,11 @@ void Sauvegarde::reinitialisationNouvellePartie() {
         if (fichierMaitres.is_open()) {
             fichierMaitres.close();
         }
-        // 2. 🔧 NOUVEAU : Réinitialiser toutes les statistiques des joueurs dans joueur.csv
         vector<string> lignes = lireLignesJoueur();
         
         if (!lignes.empty()) {
-            // Conserver l'en-tête
             vector<string> lignesMises;
-            lignesMises.push_back(lignes[0]); // En-tête
+            lignesMises.push_back(lignes[0]);
             
             // Traiter chaque joueur (à partir de la ligne 1)
             for (size_t i = 1; i < lignes.size(); ++i) {
